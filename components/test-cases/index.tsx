@@ -81,6 +81,12 @@ const TestCaseManagement: React.FC = () => {
     | "type-desc"
   >("name-asc");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // Test case sorting state
+  const [sortColumn, setSortColumn] = useState<
+    "key" | "type" | "reviewStatus" | "progress" | null
+  >(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [folders, setFolders] = useState<Folder[]>([]);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [loading, setLoading] = useState(true);
@@ -560,6 +566,69 @@ const TestCaseManagement: React.FC = () => {
     return status.replace("_", " ");
   };
 
+  // Sorting handler
+  const handleSort = (column: "key" | "type" | "reviewStatus" | "progress") => {
+    if (sortColumn === column) {
+      // Toggle direction if same column
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new column and default to ascending
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  // Get sorted test cases
+  const getSortedTestCases = (cases: TestCase[]) => {
+    if (!sortColumn) return cases;
+
+    return [...cases].sort((a, b) => {
+      let compareA: string | number = "";
+      let compareB: string | number = "";
+
+      switch (sortColumn) {
+        case "key":
+          compareA = a.key.toLowerCase();
+          compareB = b.key.toLowerCase();
+          break;
+        case "type":
+          compareA = a.type;
+          compareB = b.type;
+          break;
+        case "reviewStatus":
+          compareA = a.reviewStatus;
+          compareB = b.reviewStatus;
+          break;
+        case "progress":
+          compareA = a.progress;
+          compareB = b.progress;
+          break;
+      }
+
+      if (compareA < compareB) {
+        return sortDirection === "asc" ? -1 : 1;
+      }
+      if (compareA > compareB) {
+        return sortDirection === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  // Render sort icon
+  const SortIcon: React.FC<{
+    column: "key" | "type" | "reviewStatus" | "progress";
+  }> = ({ column }) => {
+    if (sortColumn !== column) {
+      return <BiSortAlt2 className="text-sm text-gray-400" />;
+    }
+    return sortDirection === "asc" ? (
+      <MdArrowUpward className="text-sm text-blue-600" />
+    ) : (
+      <MdArrowDownward className="text-sm text-blue-600" />
+    );
+  };
+
   const TabButton: React.FC<{
     active: boolean;
     icon: React.ReactNode;
@@ -958,43 +1027,54 @@ const TestCaseManagement: React.FC = () => {
                     />
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <div className="flex items-center gap-x-1">
-                      <span>Key</span>
-                      <BiSortAlt2 className="text-sm text-gray-400" />
-                    </div>
+                    <button
+                      onClick={() => handleSort("key")}
+                      className="flex items-center gap-x-1 transition-colors hover:text-gray-700"
+                    >
+                      <span>KEY</span>
+                      <SortIcon column="key" />
+                    </button>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
-                      <span>Summary</span>
-                      <BiSortAlt2 className="text-sm text-gray-400" />
+                      <span>SUMMARY</span>
                     </div>
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Version
+                    VERSION
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Priority
+                    PRIORITY
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <div className="flex items-center gap-x-1">
-                      <span>Type</span>
-                      <BiSortAlt2 className="text-sm text-gray-400" />
-                    </div>
+                    <button
+                      onClick={() => handleSort("type")}
+                      className="flex items-center gap-x-1 transition-colors hover:text-gray-700"
+                    >
+                      <span>TYPE</span>
+                      <SortIcon column="type" />
+                    </button>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <div className="flex items-center gap-x-1">
-                      <span>Review Status</span>
-                      <BiSortAlt2 className="text-sm text-gray-400" />
-                    </div>
+                    <button
+                      onClick={() => handleSort("reviewStatus")}
+                      className="flex items-center gap-x-1 transition-colors hover:text-gray-700"
+                    >
+                      <span>REVIEW STATUS</span>
+                      <SortIcon column="reviewStatus" />
+                    </button>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <div className="flex items-center gap-x-1">
-                      <span>Progress</span>
-                      <BiSortAlt2 className="text-sm text-gray-400" />
-                    </div>
+                    <button
+                      onClick={() => handleSort("progress")}
+                      className="flex items-center gap-x-1 transition-colors hover:text-gray-700"
+                    >
+                      <span>PROGRESS</span>
+                      <SortIcon column="progress" />
+                    </button>
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    Actions
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
@@ -1029,519 +1109,509 @@ const TestCaseManagement: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  testCases
-                    .filter(
+                  getSortedTestCases(
+                    testCases.filter(
                       (testCase) =>
                         typeFilter === "all" || testCase.type === typeFilter
                     )
-                    .map((testCase) => (
-                      <React.Fragment key={testCase.id}>
-                        <tr className="group border-b border-gray-200 transition-colors hover:bg-blue-50/30">
-                          <td className="px-6 py-4">
-                            <button
-                              onClick={() => toggleTestCase(testCase.id)}
-                              className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                  ).map((testCase) => (
+                    <React.Fragment key={testCase.id}>
+                      <tr className="group border-b border-gray-200 transition-colors hover:bg-blue-50/30">
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => toggleTestCase(testCase.id)}
+                            className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                          >
+                            {testCase.expanded ? (
+                              <MdKeyboardArrowDown className="text-xl" />
+                            ) : (
+                              <MdKeyboardArrowRight className="text-xl" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline">
+                            {testCase.key}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingTestCase === testCase.id ? (
+                            <input
+                              type="text"
+                              value={editForm.summary}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  summary: e.target.value,
+                                })
+                              }
+                              className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          ) : (
+                            <span className="text-sm font-medium text-gray-800">
+                              {testCase.summary}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
+                            v{testCase.version}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {editingTestCase === testCase.id ? (
+                            <select
+                              value={editForm.priority}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  priority: e.target.value,
+                                })
+                              }
+                              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                              {testCase.expanded ? (
-                                <MdKeyboardArrowDown className="text-xl" />
-                              ) : (
-                                <MdKeyboardArrowRight className="text-xl" />
-                              )}
+                              <option value="CRITICAL">Critical ↑↑</option>
+                              <option value="HIGH">High ↑</option>
+                              <option value="MEDIUM">Medium →</option>
+                              <option value="NORMAL">Normal →</option>
+                              <option value="LOW">Low ↓</option>
+                            </select>
+                          ) : (
+                            <span
+                              className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-sm font-bold ${
+                                getPriorityIcon(testCase.priority).color
+                              } ${getPriorityIcon(testCase.priority).bg}`}
+                            >
+                              {getPriorityIcon(testCase.priority).icon}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingTestCase === testCase.id ? (
+                            <select
+                              value={editForm.type}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  type: e.target.value,
+                                })
+                              }
+                              className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="FUNCTIONAL">Functional</option>
+                              <option value="NON_FUNCTIONAL">
+                                Non-Functional
+                              </option>
+                              <option value="PERFORMANCE">Performance</option>
+                            </select>
+                          ) : (
+                            <span
+                              className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getTypeColor(
+                                testCase.type
+                              )}`}
+                            >
+                              {formatStatus(testCase.type)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingTestCase === testCase.id ? (
+                            <select
+                              value={editForm.reviewStatus}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  reviewStatus: e.target.value,
+                                })
+                              }
+                              className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="NEW">New</option>
+                              <option value="APPROVED">Approved</option>
+                              <option value="REJECTED">Rejected</option>
+                            </select>
+                          ) : (
+                            <span
+                              className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getReviewStatusColor(
+                                testCase.reviewStatus
+                              )}`}
+                            >
+                              {formatStatus(testCase.reviewStatus)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {editingTestCase === testCase.id ? (
+                            <select
+                              value={editForm.progress}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  progress: e.target.value,
+                                })
+                              }
+                              className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="TODO">To Do</option>
+                              <option value="IN_PROGRESS">In Progress</option>
+                              <option value="DONE">Done</option>
+                              <option value="CANCELLED">Cancelled</option>
+                            </select>
+                          ) : (
+                            <span
+                              className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getProgressColor(
+                                testCase.progress
+                              )}`}
+                            >
+                              {formatStatus(testCase.progress)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {editingTestCase === testCase.id ? (
+                            <div className="flex items-center justify-center gap-x-2">
+                              <button
+                                onClick={() => saveTestCase(testCase.id)}
+                                className="rounded-lg bg-blue-600 p-2 text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
+                                title="Save"
+                              >
+                                <MdSave className="text-lg" />
+                              </button>
+                              <button
+                                onClick={cancelEditing}
+                                className="rounded-lg bg-gray-200 p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
+                                title="Cancel"
+                              >
+                                <MdClose className="text-lg" />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => startEditing(testCase)}
+                              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                              title="Edit"
+                            >
+                              <MdEdit className="text-lg" />
                             </button>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline">
-                              {testCase.key}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            {editingTestCase === testCase.id ? (
-                              <input
-                                type="text"
-                                value={editForm.summary}
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    summary: e.target.value,
-                                  })
-                                }
-                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              <span className="text-sm font-medium text-gray-800">
-                                {testCase.summary}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
-                              v{testCase.version}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            {editingTestCase === testCase.id ? (
-                              <select
-                                value={editForm.priority}
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    priority: e.target.value,
-                                  })
-                                }
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="CRITICAL">Critical ↑↑</option>
-                                <option value="HIGH">High ↑</option>
-                                <option value="MEDIUM">Medium →</option>
-                                <option value="NORMAL">Normal →</option>
-                                <option value="LOW">Low ↓</option>
-                              </select>
-                            ) : (
-                              <span
-                                className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-sm font-bold ${
-                                  getPriorityIcon(testCase.priority).color
-                                } ${getPriorityIcon(testCase.priority).bg}`}
-                              >
-                                {getPriorityIcon(testCase.priority).icon}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            {editingTestCase === testCase.id ? (
-                              <select
-                                value={editForm.type}
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    type: e.target.value,
-                                  })
-                                }
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="FUNCTIONAL">Functional</option>
-                                <option value="NON_FUNCTIONAL">
-                                  Non-Functional
-                                </option>
-                                <option value="PERFORMANCE">Performance</option>
-                              </select>
-                            ) : (
-                              <span
-                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getTypeColor(
-                                  testCase.type
-                                )}`}
-                              >
-                                {formatStatus(testCase.type)}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            {editingTestCase === testCase.id ? (
-                              <select
-                                value={editForm.reviewStatus}
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    reviewStatus: e.target.value,
-                                  })
-                                }
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="NEW">New</option>
-                                <option value="APPROVED">Approved</option>
-                                <option value="REJECTED">Rejected</option>
-                              </select>
-                            ) : (
-                              <span
-                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getReviewStatusColor(
-                                  testCase.reviewStatus
-                                )}`}
-                              >
-                                {formatStatus(testCase.reviewStatus)}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            {editingTestCase === testCase.id ? (
-                              <select
-                                value={editForm.progress}
-                                onChange={(e) =>
-                                  setEditForm({
-                                    ...editForm,
-                                    progress: e.target.value,
-                                  })
-                                }
-                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="TODO">To Do</option>
-                                <option value="IN_PROGRESS">In Progress</option>
-                                <option value="DONE">Done</option>
-                                <option value="CANCELLED">Cancelled</option>
-                              </select>
-                            ) : (
-                              <span
-                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getProgressColor(
-                                  testCase.progress
-                                )}`}
-                              >
-                                {formatStatus(testCase.progress)}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            {editingTestCase === testCase.id ? (
-                              <div className="flex items-center justify-center gap-x-2">
+                          )}
+                        </td>
+                      </tr>
+
+                      {/* Expanded Test Steps */}
+                      {testCase.expanded && (
+                        <tr>
+                          <td
+                            colSpan={9}
+                            className="bg-gradient-to-br from-blue-50/20 to-gray-50/40 px-6 py-5"
+                          >
+                            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                              <div className="mb-4 flex items-center justify-between">
+                                <h3 className="flex items-center gap-x-2.5 text-base font-semibold text-gray-800">
+                                  <span className="text-xl">📋</span>
+                                  <span>Test Steps</span>
+                                  <span className="ml-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                                    {testCase.steps?.length || 0}
+                                  </span>
+                                </h3>
                                 <button
-                                  onClick={() => saveTestCase(testCase.id)}
-                                  className="rounded-lg bg-blue-600 p-2 text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
-                                  title="Save"
+                                  onClick={() =>
+                                    setAddingStepToTestCase(testCase.id)
+                                  }
+                                  className="flex items-center gap-x-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
                                 >
-                                  <MdSave className="text-lg" />
-                                </button>
-                                <button
-                                  onClick={cancelEditing}
-                                  className="rounded-lg bg-gray-200 p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
-                                  title="Cancel"
-                                >
-                                  <MdClose className="text-lg" />
+                                  <MdAdd className="text-base" />
+                                  Add Step
                                 </button>
                               </div>
-                            ) : (
-                              <button
-                                onClick={() => startEditing(testCase)}
-                                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                                title="Edit"
-                              >
-                                <MdEdit className="text-lg" />
-                              </button>
-                            )}
+
+                              {testCase.steps && testCase.steps.length > 0 ? (
+                                <table className="w-full">
+                                  <thead className="border-b-2 border-gray-200 bg-gray-50/80">
+                                    <tr>
+                                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        #
+                                      </th>
+                                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Step Summary
+                                      </th>
+                                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Pre Condition
+                                      </th>
+                                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Test Data
+                                      </th>
+                                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Expected Result
+                                      </th>
+                                      <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                        Actions
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {testCase.steps.map((step) => (
+                                      <tr
+                                        key={step.id}
+                                        className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50"
+                                      >
+                                        <td className="px-4 py-4 text-center">
+                                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                                            {step.stepNumber}
+                                          </span>
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-800">
+                                          {editingStep === step.id ? (
+                                            <textarea
+                                              value={editStepForm.summary}
+                                              onChange={(e) =>
+                                                setEditStepForm({
+                                                  ...editStepForm,
+                                                  summary: e.target.value,
+                                                })
+                                              }
+                                              className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              rows={2}
+                                            />
+                                          ) : (
+                                            <span className="font-medium">
+                                              {step.summary}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-600">
+                                          {editingStep === step.id ? (
+                                            <textarea
+                                              value={editStepForm.preCondition}
+                                              onChange={(e) =>
+                                                setEditStepForm({
+                                                  ...editStepForm,
+                                                  preCondition: e.target.value,
+                                                })
+                                              }
+                                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              rows={2}
+                                            />
+                                          ) : (
+                                            <span className="text-gray-600">
+                                              {step.preCondition || "-"}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-600">
+                                          {editingStep === step.id ? (
+                                            <textarea
+                                              value={editStepForm.testData}
+                                              onChange={(e) =>
+                                                setEditStepForm({
+                                                  ...editStepForm,
+                                                  testData: e.target.value,
+                                                })
+                                              }
+                                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              rows={2}
+                                            />
+                                          ) : (
+                                            <span className="text-gray-600">
+                                              {step.testData || "-"}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-800">
+                                          {editingStep === step.id ? (
+                                            <textarea
+                                              value={
+                                                editStepForm.expectedResult
+                                              }
+                                              onChange={(e) =>
+                                                setEditStepForm({
+                                                  ...editStepForm,
+                                                  expectedResult:
+                                                    e.target.value,
+                                                })
+                                              }
+                                              className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              rows={2}
+                                            />
+                                          ) : (
+                                            <span className="font-medium">
+                                              {step.expectedResult}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="px-4 py-4 text-center">
+                                          {editingStep === step.id ? (
+                                            <div className="flex items-center justify-center gap-x-2">
+                                              <button
+                                                onClick={() =>
+                                                  saveStep(testCase.id, step.id)
+                                                }
+                                                className="rounded-lg bg-green-600 p-1.5 text-white shadow-sm transition-all hover:bg-green-700"
+                                                title="Save"
+                                              >
+                                                <MdSave className="text-base" />
+                                              </button>
+                                              <button
+                                                onClick={cancelEditingStep}
+                                                className="rounded-lg bg-gray-200 p-1.5 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
+                                                title="Cancel"
+                                              >
+                                                <MdClose className="text-base" />
+                                              </button>
+                                            </div>
+                                          ) : (
+                                            <div className="flex items-center justify-center gap-x-2">
+                                              <button
+                                                onClick={() =>
+                                                  startEditingStep(step)
+                                                }
+                                                className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
+                                                title="Edit Step"
+                                              >
+                                                <MdEdit className="text-base" />
+                                              </button>
+                                              <button
+                                                onClick={() =>
+                                                  deleteStep(
+                                                    testCase.id,
+                                                    step.id
+                                                  )
+                                                }
+                                                className="rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                title="Delete Step"
+                                              >
+                                                <MdDelete className="text-base" />
+                                              </button>
+                                            </div>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              ) : (
+                                <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-blue-50/20 py-12 text-center">
+                                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-3xl">
+                                    📋
+                                  </div>
+                                  <p className="mb-2 text-sm font-medium text-gray-700">
+                                    No test steps added yet
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Click "Add Step" to create your first test
+                                    step
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Add Step Form */}
+                              {addingStepToTestCase === testCase.id && (
+                                <div className="mt-5 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
+                                  <h4 className="mb-4 flex items-center gap-x-2 text-base font-semibold text-gray-800">
+                                    <span className="text-blue-600">➕</span>
+                                    Add New Step
+                                  </h4>
+                                  <div className="grid grid-cols-4 gap-4">
+                                    <div>
+                                      <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                        Step Details{" "}
+                                        <span className="text-red-500">*</span>
+                                      </label>
+                                      <textarea
+                                        value={newStep.summary}
+                                        onChange={(e) =>
+                                          setNewStep({
+                                            ...newStep,
+                                            summary: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Enter step details..."
+                                        className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        rows={3}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                        Pre Condition
+                                      </label>
+                                      <textarea
+                                        value={newStep.preCondition}
+                                        onChange={(e) =>
+                                          setNewStep({
+                                            ...newStep,
+                                            preCondition: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Enter pre condition..."
+                                        className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        rows={3}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                        Test Data
+                                      </label>
+                                      <textarea
+                                        value={newStep.testData}
+                                        onChange={(e) =>
+                                          setNewStep({
+                                            ...newStep,
+                                            testData: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Enter test data..."
+                                        className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        rows={3}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                        Expected Result{" "}
+                                        <span className="text-red-500">*</span>
+                                      </label>
+                                      <textarea
+                                        value={newStep.expectedResult}
+                                        onChange={(e) =>
+                                          setNewStep({
+                                            ...newStep,
+                                            expectedResult: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Enter expected result..."
+                                        className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                        rows={3}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="mt-4 flex justify-end gap-x-3">
+                                    <button
+                                      onClick={() => {
+                                        setAddingStepToTestCase(null);
+                                        setNewStep({
+                                          summary: "",
+                                          preCondition: "",
+                                          testData: "",
+                                          expectedResult: "",
+                                        });
+                                      }}
+                                      className="rounded-lg border-2 border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      onClick={() => addStep(testCase.id)}
+                                      className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
+                                    >
+                                      Add Step
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </td>
                         </tr>
-
-                        {/* Expanded Test Steps */}
-                        {testCase.expanded && (
-                          <tr>
-                            <td
-                              colSpan={9}
-                              className="bg-gradient-to-br from-blue-50/20 to-gray-50/40 px-6 py-5"
-                            >
-                              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                                <div className="mb-4 flex items-center justify-between">
-                                  <h3 className="flex items-center gap-x-2.5 text-base font-semibold text-gray-800">
-                                    <span className="text-xl">📋</span>
-                                    <span>Test Steps</span>
-                                    <span className="ml-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
-                                      {testCase.steps?.length || 0}
-                                    </span>
-                                  </h3>
-                                  <button
-                                    onClick={() =>
-                                      setAddingStepToTestCase(testCase.id)
-                                    }
-                                    className="flex items-center gap-x-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
-                                  >
-                                    <MdAdd className="text-base" />
-                                    Add Step
-                                  </button>
-                                </div>
-
-                                {testCase.steps && testCase.steps.length > 0 ? (
-                                  <table className="w-full">
-                                    <thead className="border-b-2 border-gray-200 bg-gray-50/80">
-                                      <tr>
-                                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          #
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          Step Summary
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          Pre Condition
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          Test Data
-                                        </th>
-                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          Expected Result
-                                        </th>
-                                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                          Actions
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {testCase.steps.map((step) => (
-                                        <tr
-                                          key={step.id}
-                                          className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50"
-                                        >
-                                          <td className="px-4 py-4 text-center">
-                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
-                                              {step.stepNumber}
-                                            </span>
-                                          </td>
-                                          <td className="px-4 py-4 text-sm text-gray-800">
-                                            {editingStep === step.id ? (
-                                              <textarea
-                                                value={editStepForm.summary}
-                                                onChange={(e) =>
-                                                  setEditStepForm({
-                                                    ...editStepForm,
-                                                    summary: e.target.value,
-                                                  })
-                                                }
-                                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                rows={2}
-                                              />
-                                            ) : (
-                                              <span className="font-medium">
-                                                {step.summary}
-                                              </span>
-                                            )}
-                                          </td>
-                                          <td className="px-4 py-4 text-sm text-gray-600">
-                                            {editingStep === step.id ? (
-                                              <textarea
-                                                value={
-                                                  editStepForm.preCondition
-                                                }
-                                                onChange={(e) =>
-                                                  setEditStepForm({
-                                                    ...editStepForm,
-                                                    preCondition:
-                                                      e.target.value,
-                                                  })
-                                                }
-                                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                rows={2}
-                                              />
-                                            ) : (
-                                              <span className="text-gray-600">
-                                                {step.preCondition || "-"}
-                                              </span>
-                                            )}
-                                          </td>
-                                          <td className="px-4 py-4 text-sm text-gray-600">
-                                            {editingStep === step.id ? (
-                                              <textarea
-                                                value={editStepForm.testData}
-                                                onChange={(e) =>
-                                                  setEditStepForm({
-                                                    ...editStepForm,
-                                                    testData: e.target.value,
-                                                  })
-                                                }
-                                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                rows={2}
-                                              />
-                                            ) : (
-                                              <span className="text-gray-600">
-                                                {step.testData || "-"}
-                                              </span>
-                                            )}
-                                          </td>
-                                          <td className="px-4 py-4 text-sm text-gray-800">
-                                            {editingStep === step.id ? (
-                                              <textarea
-                                                value={
-                                                  editStepForm.expectedResult
-                                                }
-                                                onChange={(e) =>
-                                                  setEditStepForm({
-                                                    ...editStepForm,
-                                                    expectedResult:
-                                                      e.target.value,
-                                                  })
-                                                }
-                                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                rows={2}
-                                              />
-                                            ) : (
-                                              <span className="font-medium">
-                                                {step.expectedResult}
-                                              </span>
-                                            )}
-                                          </td>
-                                          <td className="px-4 py-4 text-center">
-                                            {editingStep === step.id ? (
-                                              <div className="flex items-center justify-center gap-x-2">
-                                                <button
-                                                  onClick={() =>
-                                                    saveStep(
-                                                      testCase.id,
-                                                      step.id
-                                                    )
-                                                  }
-                                                  className="rounded-lg bg-green-600 p-1.5 text-white shadow-sm transition-all hover:bg-green-700"
-                                                  title="Save"
-                                                >
-                                                  <MdSave className="text-base" />
-                                                </button>
-                                                <button
-                                                  onClick={cancelEditingStep}
-                                                  className="rounded-lg bg-gray-200 p-1.5 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
-                                                  title="Cancel"
-                                                >
-                                                  <MdClose className="text-base" />
-                                                </button>
-                                              </div>
-                                            ) : (
-                                              <div className="flex items-center justify-center gap-x-2">
-                                                <button
-                                                  onClick={() =>
-                                                    startEditingStep(step)
-                                                  }
-                                                  className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
-                                                  title="Edit Step"
-                                                >
-                                                  <MdEdit className="text-base" />
-                                                </button>
-                                                <button
-                                                  onClick={() =>
-                                                    deleteStep(
-                                                      testCase.id,
-                                                      step.id
-                                                    )
-                                                  }
-                                                  className="rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
-                                                  title="Delete Step"
-                                                >
-                                                  <MdDelete className="text-base" />
-                                                </button>
-                                              </div>
-                                            )}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                ) : (
-                                  <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-blue-50/20 py-12 text-center">
-                                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-3xl">
-                                      📋
-                                    </div>
-                                    <p className="mb-2 text-sm font-medium text-gray-700">
-                                      No test steps added yet
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      Click "Add Step" to create your first test
-                                      step
-                                    </p>
-                                  </div>
-                                )}
-
-                                {/* Add Step Form */}
-                                {addingStepToTestCase === testCase.id && (
-                                  <div className="mt-5 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
-                                    <h4 className="mb-4 flex items-center gap-x-2 text-base font-semibold text-gray-800">
-                                      <span className="text-blue-600">➕</span>
-                                      Add New Step
-                                    </h4>
-                                    <div className="grid grid-cols-4 gap-4">
-                                      <div>
-                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
-                                          Step Details{" "}
-                                          <span className="text-red-500">
-                                            *
-                                          </span>
-                                        </label>
-                                        <textarea
-                                          value={newStep.summary}
-                                          onChange={(e) =>
-                                            setNewStep({
-                                              ...newStep,
-                                              summary: e.target.value,
-                                            })
-                                          }
-                                          placeholder="Enter step details..."
-                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                          rows={3}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
-                                          Pre Condition
-                                        </label>
-                                        <textarea
-                                          value={newStep.preCondition}
-                                          onChange={(e) =>
-                                            setNewStep({
-                                              ...newStep,
-                                              preCondition: e.target.value,
-                                            })
-                                          }
-                                          placeholder="Enter pre condition..."
-                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                          rows={3}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
-                                          Test Data
-                                        </label>
-                                        <textarea
-                                          value={newStep.testData}
-                                          onChange={(e) =>
-                                            setNewStep({
-                                              ...newStep,
-                                              testData: e.target.value,
-                                            })
-                                          }
-                                          placeholder="Enter test data..."
-                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                          rows={3}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
-                                          Expected Result{" "}
-                                          <span className="text-red-500">
-                                            *
-                                          </span>
-                                        </label>
-                                        <textarea
-                                          value={newStep.expectedResult}
-                                          onChange={(e) =>
-                                            setNewStep({
-                                              ...newStep,
-                                              expectedResult: e.target.value,
-                                            })
-                                          }
-                                          placeholder="Enter expected result..."
-                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                          rows={3}
-                                        />
-                                      </div>
-                                    </div>
-                                    <div className="mt-4 flex justify-end gap-x-3">
-                                      <button
-                                        onClick={() => {
-                                          setAddingStepToTestCase(null);
-                                          setNewStep({
-                                            summary: "",
-                                            preCondition: "",
-                                            testData: "",
-                                            expectedResult: "",
-                                          });
-                                        }}
-                                        className="rounded-lg border-2 border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-                                      >
-                                        Cancel
-                                      </button>
-                                      <button
-                                        onClick={() => addStep(testCase.id)}
-                                        className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
-                                      >
-                                        Add Step
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    ))
+                      )}
+                    </React.Fragment>
+                  ))
                 )}
               </tbody>
             </table>
