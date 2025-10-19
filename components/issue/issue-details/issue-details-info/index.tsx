@@ -245,7 +245,7 @@ const LargeIssueDetails = React.forwardRef<
             onClick={() => setShowTestCaseGenerator(true)}
           >
             <IoSparkles className="text-lg" />
-            <span>Generate Test cases With Novigi's QI</span>
+            <span>Novigi's QI</span>
           </Button>
         </div>
 
