@@ -741,7 +741,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
               <div className="flex-1">
                 <h4 className="mb-1 text-base font-bold text-green-900">
-                  Success! {generatedCount} Test Cases Generated
+                  Test Cases Generated Successfully!
                 </h4>
                 <p className="mb-3 text-sm text-green-800">
                   Your test cases have been successfully created and are ready
