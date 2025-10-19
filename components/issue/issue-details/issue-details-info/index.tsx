@@ -276,6 +276,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [generatedCount, setGeneratedCount] = useState(0);
+  const [showViewOptions, setShowViewOptions] = useState(false);
 
   const toggleTestType = (type: string) => {
     setSelectedTestTypes((prev) =>
@@ -591,6 +592,34 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
         </div>
 
+        {/* Test Case and Step Count Inputs */}
+        <div className="mb-4 grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Test case count
+            </label>
+            <input
+              type="number"
+              min="1"
+              defaultValue="5"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="Enter count"
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Step count
+            </label>
+            <input
+              type="number"
+              min="1"
+              defaultValue="3"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="Enter count"
+            />
+          </div>
+        </div>
+
         {/* Action Buttons */}
         <div className="flex items-center justify-between gap-x-3">
           <Button
@@ -621,6 +650,43 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           >
             Cancel
           </Button>
+        </div>
+
+        {/* Collapsible View Options */}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowViewOptions(!showViewOptions)}
+            className="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+          >
+            <span>View Options</span>
+            <svg
+              className={`h-5 w-5 transition-transform ${showViewOptions ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {showViewOptions && (
+            <div className="mt-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <button className="flex items-center justify-center gap-x-2 rounded-md border border-blue-600 bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z" />
+                  </svg>
+                  Preview In JIRA
+                </button>
+                <button className="flex items-center justify-center gap-x-2 rounded-md border border-indigo-600 bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700">
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  Preview in Confluence
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Progress Bar */}
