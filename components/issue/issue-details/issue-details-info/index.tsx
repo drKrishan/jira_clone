@@ -296,11 +296,15 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           clearInterval(interval);
           setIsCompleted(true);
           setGeneratedCount(15);
+          setIsGenerating(false);
           toast.success("Test cases generated successfully!");
           return 100;
         }
         // Increment progress with variable speed for realistic effect
-        return prev + Math.random() * 15;
+        // Ensure it never goes above 100
+        const increment = Math.random() * 15;
+        const newProgress = prev + increment;
+        return Math.min(newProgress, 100);
       });
     }, 300);
   };
