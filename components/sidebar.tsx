@@ -9,6 +9,7 @@ import {
 } from "./ui/navigation-menu";
 import { usePathname } from "next/navigation";
 import { FaChessPawn, FaChevronRight } from "react-icons/fa";
+import { FiFileText } from "react-icons/fi";
 import { useProject } from "@/hooks/query-hooks/use-project";
 
 type NavItemType = {
@@ -41,6 +42,15 @@ const Sidebar: React.FC = () => {
     },
   ];
 
+  const testingItems = [
+    {
+      id: "test-cases",
+      label: "Test Cases",
+      icon: FiFileText,
+      href: `/project/test-cases`,
+    },
+  ];
+
   const developmentItems = [
     {
       id: "development",
@@ -63,6 +73,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       <NavList label={"PLANNING"} items={planningItems} />
+      <NavList label={"TESTING"} items={testingItems} />
       <NavList label={"DEVELOPMENT"} items={developmentItems} />
     </div>
   );

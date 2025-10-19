@@ -13,6 +13,7 @@ const IssueDetails: React.FC<{
   const { issues } = useIssues();
   const renderContainerRef = React.useRef<HTMLDivElement>(null);
   const [isInViewport, viewportRef] = useIsInViewport({ threshold: 1 });
+  const [showTestCaseGenerator, setShowTestCaseGenerator] = useState(false);
 
   const getIssue = useCallback(
     (issueKey: string | null) => {
@@ -42,7 +43,12 @@ const IssueDetails: React.FC<{
         setIssueKey={setIssueKey}
         isInViewport={isInViewport}
       />
-      <IssueDetailsInfo issue={issueInfo} ref={viewportRef} />
+      <IssueDetailsInfo
+        issue={issueInfo}
+        ref={viewportRef}
+        showTestCaseGenerator={showTestCaseGenerator}
+        setShowTestCaseGenerator={setShowTestCaseGenerator}
+      />
     </div>
   );
 };

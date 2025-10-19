@@ -5,15 +5,20 @@ import { TooltipWrapper } from "@/components/ui/tooltip";
 import { BiLink } from "react-icons/bi";
 import { BsThreeDots } from "react-icons/bs";
 import { CgAttachment } from "react-icons/cg";
+import { useState } from "react";
+import { IssueAttachments } from "./issue-attachments";
 
 const IssueDetailsInfoActions: React.FC<{
   onAddChildIssue: () => void;
   variant?: "sm" | "lg";
 }> = ({ onAddChildIssue, variant = "sm" }) => {
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
+
   return (
     <div className="flex gap-x-2 text-gray-700">
-      <NotImplemented feature="attachment">
+      <TooltipWrapper text="Attach files">
         <Button
+          onClick={() => setIsAttachmentModalOpen(true)}
           customColors
           className="flex items-center whitespace-nowrap bg-gray-100 hover:bg-gray-200"
         >
@@ -25,7 +30,7 @@ const IssueDetailsInfoActions: React.FC<{
             {variant === "sm" ? null : "Attach"}
           </span>
         </Button>
-      </NotImplemented>
+      </TooltipWrapper>
       <TooltipWrapper text="Add child issue">
         <Button
           onClick={onAddChildIssue}
@@ -63,6 +68,12 @@ const IssueDetailsInfoActions: React.FC<{
           <BsThreeDots className="text-xl" />
         </Button>
       </NotImplemented>
+
+      {/* Attachment Modal */}
+      <IssueAttachments
+        isOpen={isAttachmentModalOpen}
+        onClose={() => setIsAttachmentModalOpen(false)}
+      />
     </div>
   );
 };
