@@ -10,6 +10,9 @@ import {
 } from "@/server/functions";
 import { currentUser } from "@clerk/nextjs";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Roadmap",
 };
