@@ -1935,7 +1935,7 @@ const TestCaseManagement: React.FC = () => {
                   <h2 className="mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent">
                     {welcomeConfig.title.replace(
                       "I am",
-                      user?.firstName ? `I am ${user.firstName}'s` : "I am"
+                      user?.firstName ? `I am Novigi's` : "I am"
                     )}
                   </h2>
                   <p className="text-base leading-relaxed text-gray-600">

@@ -130,7 +130,7 @@ const SmallIssueDetailsInfo = React.forwardRef<
           onClick={() => setShowTestCaseGenerator(true)}
         >
           <IoSparkles className="text-lg" />
-          <span>Generate Test cases With Navagi</span>
+          <span>Novigi's QI</span>
         </Button>
       </div>
       <Description issue={issue} key={String(issueKey) + issue.id} />
@@ -245,7 +245,7 @@ const LargeIssueDetails = React.forwardRef<
             onClick={() => setShowTestCaseGenerator(true)}
           >
             <IoSparkles className="text-lg" />
-            <span>Generate Test cases With Navagi</span>
+            <span>Generate Test cases With Novigi's QI</span>
           </Button>
         </div>
 
@@ -387,7 +387,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               <h3 className="text-lg font-semibold text-gray-900">
                 AI Test Case Generator
               </h3>
-              <p className="text-sm text-gray-600">Powered by Navagi AI</p>
+              <p className="text-sm text-gray-600">Powered by Novigi's QI</p>
             </div>
           </div>
           <div className="flex items-center gap-x-2">
