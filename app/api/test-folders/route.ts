@@ -5,12 +5,25 @@ import { auth } from "@clerk/nextjs";
 export async function GET() {
   try {
     const folders = await prisma.testFolder.findMany({
+      include: {
+        _count: {
+          select: {
+            testCases: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "asc",
       },
     });
 
-    return NextResponse.json(folders);
+    // Map folders to include actual test case count
+    const foldersWithActualCount = folders.map((folder: any) => ({
+      ...folder,
+      count: folder._count.testCases, // Use actual count from database
+    }));
+
+    return NextResponse.json(foldersWithActualCount);
   } catch (error) {
     console.error("Error fetching folders:", error);
     return NextResponse.json(

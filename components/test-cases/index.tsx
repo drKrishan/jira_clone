@@ -68,7 +68,7 @@ const TestCaseManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "test-case" | "test-cycle" | "test-plan" | "test-report"
   >("test-case");
-  const [selectedFolder, setSelectedFolder] = useState<string>("all");
+  const [selectedFolder, setSelectedFolder] = useState<string>("");
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
@@ -116,7 +116,6 @@ const TestCaseManagement: React.FC = () => {
   // Fetch folders on mount
   useEffect(() => {
     fetchFolders();
-    fetchTestCases();
   }, []);
 
   const fetchFolders = async () => {
@@ -124,6 +123,13 @@ const TestCaseManagement: React.FC = () => {
       const response = await fetch("/api/test-folders");
       const data = await response.json();
       setFolders(data);
+
+      // Set first folder as selected by default
+      if (data.length > 0) {
+        const firstFolder = data[0];
+        setSelectedFolder(firstFolder.id);
+        fetchTestCases(firstFolder.id);
+      }
     } catch (error) {
       console.error("Error fetching folders:", error);
       toast.error("Failed to load folders");
@@ -188,11 +194,7 @@ const TestCaseManagement: React.FC = () => {
   const handleFolderClick = (folderId: string) => {
     setSelectedFolder(folderId);
     // Fetch test cases for the selected folder
-    if (folderId === "all") {
-      fetchTestCases(); // Fetch all test cases
-    } else {
-      fetchTestCases(folderId); // Fetch test cases for specific folder
-    }
+    fetchTestCases(folderId);
     // Toggle folder expansion if it has items
     const folder = folders.find((f) => f.id === folderId);
     if (folder && folder.count > 0) {
@@ -617,24 +619,18 @@ const TestCaseManagement: React.FC = () => {
             <span>Generate Test Cases</span>
           </Button>
           <CreateTestCaseModal
-            folderId={
-              selectedFolder === "all" ? folders[0]?.id || "" : selectedFolder
-            }
+            folderId={selectedFolder}
             folderName={
-              selectedFolder === "all"
-                ? folders[0]?.name || "Default Folder"
-                : folders.find((f) => f.id === selectedFolder)?.name || "Folder"
+              folders.find((f) => f.id === selectedFolder)?.name || "Folder"
             }
             onTestCaseCreated={() => {
-              fetchTestCases(
-                selectedFolder === "all" ? undefined : selectedFolder
-              );
+              fetchTestCases(selectedFolder);
             }}
           >
             <Button
               customColors
               className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-              disabled={selectedFolder === "all" && folders.length === 0}
+              disabled={!selectedFolder || folders.length === 0}
             >
               <MdAdd className="text-lg" />
               <span>New</span>
@@ -796,30 +792,6 @@ const TestCaseManagement: React.FC = () => {
           </div>
 
           <div className="overflow-y-auto p-2">
-            {/* All Test Cases - Default View */}
-            <div className="mb-1">
-              <button
-                onClick={() => handleFolderClick("all")}
-                className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
-                  selectedFolder === "all"
-                    ? "bg-blue-100 text-blue-700"
-                    : "text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                <div className="flex items-center gap-x-2">
-                  <span className="w-4" />
-                  <MdFolder className="text-blue-500" />
-                  <span className="truncate font-medium">All Test Cases</span>
-                </div>
-                <span className="ml-2 rounded bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-700">
-                  {testCases.length}
-                </span>
-              </button>
-            </div>
-
-            {/* Separator */}
-            <div className="my-2 border-t border-gray-200"></div>
-
             {folders.map((folder) => (
               <div key={folder.id} className="mb-1">
                 <button
@@ -840,10 +812,22 @@ const TestCaseManagement: React.FC = () => {
                     ) : (
                       <span className="w-4" />
                     )}
-                    <MdFolder className="text-gray-500" />
+                    <MdFolder
+                      className={
+                        selectedFolder === folder.id
+                          ? "text-blue-500"
+                          : "text-gray-500"
+                      }
+                    />
                     <span className="truncate font-medium">{folder.name}</span>
                   </div>
-                  <span className="ml-2 rounded bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  <span
+                    className={`ml-2 rounded px-2 py-0.5 text-xs font-medium ${
+                      selectedFolder === folder.id
+                        ? "bg-blue-200 text-blue-700"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
                     {folder.count}
                   </span>
                 </button>
@@ -860,10 +844,8 @@ const TestCaseManagement: React.FC = () => {
               <div className="flex items-center gap-x-2">
                 <MdFolder className="text-blue-500" />
                 <span className="text-sm font-semibold text-gray-700">
-                  {selectedFolder === "all"
-                    ? "All Test Cases"
-                    : folders.find((f) => f.id === selectedFolder)?.name ||
-                      "Folder"}
+                  {folders.find((f) => f.id === selectedFolder)?.name ||
+                    "Folder"}
                 </span>
                 <span className="text-sm text-gray-500">
                   ({testCases.length}{" "}
@@ -872,11 +854,7 @@ const TestCaseManagement: React.FC = () => {
               </div>
               <Button
                 customColors
-                onClick={() =>
-                  fetchTestCases(
-                    selectedFolder === "all" ? undefined : selectedFolder
-                  )
-                }
+                onClick={() => fetchTestCases(selectedFolder)}
                 className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
                 title="Refresh test cases"
               >

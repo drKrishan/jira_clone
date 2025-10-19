@@ -6,25 +6,13 @@ async function seedTestCases() {
   console.log("Seeding test cases...");
 
   // Create test folders
-  const allTestCasesFolder = await prisma.testFolder.upsert({
-    where: { id: "folder-all" },
-    update: {},
-    create: {
-      id: "folder-all",
-      name: "All Test Cases",
-      count: 234,
-      projectId: "project-1",
-      creatorId: "user_2cmLPc7fWPh0ZfAVcdV9PFLvXBi",
-    },
-  });
-
   const appModFolder = await prisma.testFolder.upsert({
     where: { id: "folder-app-mod" },
     update: {},
     create: {
       id: "folder-app-mod",
       name: "App Modifications",
-      count: 19,
+      count: 2,
       projectId: "project-1",
       creatorId: "user_2cmLPc7fWPh0ZfAVcdV9PFLvXBi",
     },
@@ -36,7 +24,7 @@ async function seedTestCases() {
     create: {
       id: "folder-login",
       name: "Login Tests",
-      count: 6,
+      count: 5,
       projectId: "project-1",
       creatorId: "user_2cmLPc7fWPh0ZfAVcdV9PFLvXBi",
     },
