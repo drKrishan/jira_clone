@@ -102,6 +102,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "2f04b476-5a2b-4073-" + slicedUserId,
@@ -122,6 +123,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "5521fc5a-af0b-4905-" + slicedUserId,
@@ -142,6 +144,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "55a7d19e-844c-40fd-" + slicedUserId,
@@ -162,6 +165,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "6f139401-d32e-4386-" + slicedUserId,
@@ -182,6 +186,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "70c4152c-2063-47ad-" + slicedUserId,
@@ -202,6 +207,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: "#f97463",
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "7f9b5dba-6017-4e56-" + slicedUserId,
@@ -223,6 +229,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "af3dde63-3ddb-4e72-" + slicedUserId,
@@ -243,6 +250,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "b6e4ace2-6911-40c6-" + slicedUserId,
@@ -263,6 +271,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: "#0b66e4",
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "cd44dff4-d69b-4724-" + slicedUserId,
@@ -284,6 +293,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "ecab71cf-a4d7-4416-" + slicedUserId,
@@ -304,6 +314,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
     {
       id: "fd552347-0e93-4c98-" + slicedUserId,
@@ -324,6 +335,7 @@ export function generateInitialUserIssues(userId: string): Issue[] {
       deletedAt: null,
       sprintColor: null,
       creatorId: userId,
+      acceptanceCriteria: null,
     },
   ];
 }
