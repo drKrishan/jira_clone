@@ -59,10 +59,13 @@ export async function DELETE(
 
     // Update step numbers to be sequential
     for (let i = 0; i < remainingSteps.length; i++) {
-      await prisma.testStep.update({
-        where: { id: remainingSteps[i].id },
-        data: { stepNumber: i + 1 },
-      });
+      const step = remainingSteps[i];
+      if (step) {
+        await prisma.testStep.update({
+          where: { id: step.id },
+          data: { stepNumber: i + 1 },
+        });
+      }
     }
 
     return NextResponse.json({ success: true });
