@@ -72,6 +72,9 @@ const TestCaseManagement: React.FC = () => {
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+  const [folderMenuOpen, setFolderMenuOpen] = useState<string | null>(null);
+  const [deletingFolder, setDeletingFolder] = useState<string | null>(null);
+  const [deletingTestCase, setDeletingTestCase] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<
     | "name-asc"
     | "name-desc"
@@ -186,6 +189,30 @@ const TestCaseManagement: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSortMenuOpen]);
+
+  // Close folder menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (folderMenuOpen) {
+        const target = event.target as HTMLElement;
+        // Check if click is outside the menu and not on the three-dot button
+        if (
+          !target.closest(".folder-menu") &&
+          !target.closest(".folder-menu-button")
+        ) {
+          setFolderMenuOpen(null);
+        }
+      }
+    };
+
+    if (folderMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [folderMenuOpen]);
 
   const toggleFolder = (folderId: string) => {
     setFolders((prev) =>
@@ -501,6 +528,106 @@ const TestCaseManagement: React.FC = () => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       createFolder();
+    }
+  };
+
+  const deleteFolder = async (folderId: string) => {
+    try {
+      console.log("=== DELETE FOLDER ATTEMPT ===");
+      console.log("folderId:", folderId);
+      console.log("All folders:", folders);
+
+      const folder = folders.find((f) => f.id === folderId);
+      console.log("Found folder to delete:", folder);
+
+      if (folder && folder.count > 0) {
+        console.log(
+          "Folder has test cases, cannot delete. Count:",
+          folder.count
+        );
+        toast.error(
+          "Cannot delete folder with test cases. Please move or delete all test cases first."
+        );
+        setDeletingFolder(null);
+        setFolderMenuOpen(null);
+        return;
+      }
+
+      console.log("Folder is empty or not found, proceeding with API call");
+      const response = await fetch(`/api/test-folders/${folderId}`, {
+        method: "DELETE",
+      });
+
+      console.log("API Response status:", response.status, response.ok);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Folder deletion response:", data);
+
+        setFolders((prev) => prev.filter((f) => f.id !== folderId));
+        toast.success("Folder deleted successfully!");
+
+        // If deleted folder was selected, select another folder
+        if (selectedFolder === folderId) {
+          const remainingFolders = folders.filter((f) => f.id !== folderId);
+          if (remainingFolders.length > 0 && remainingFolders[0]) {
+            setSelectedFolder(remainingFolders[0].id);
+            fetchTestCases(remainingFolders[0].id);
+          } else {
+            setSelectedFolder("");
+            setTestCases([]);
+          }
+        }
+      } else {
+        const data = await response.json();
+        console.error(
+          "Folder deletion error:",
+          data,
+          "Status:",
+          response.status
+        );
+        toast.error(data.message || data.error || "Failed to delete folder");
+      }
+    } catch (error) {
+      console.error("Error deleting folder:", error);
+      toast.error("Failed to delete folder");
+    } finally {
+      setDeletingFolder(null);
+      setFolderMenuOpen(null);
+    }
+  };
+
+  const deleteTestCase = async (testCaseId: string) => {
+    try {
+      const response = await fetch(`/api/test-cases/${testCaseId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove test case from state
+        setTestCases((prev) => prev.filter((tc) => tc.id !== testCaseId));
+
+        // Update folder count in state
+        if (selectedFolder) {
+          setFolders((prev) =>
+            prev.map((f) =>
+              f.id === selectedFolder
+                ? { ...f, count: Math.max(0, f.count - 1) }
+                : f
+            )
+          );
+        }
+
+        toast.success("Test case deleted successfully!");
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to delete test case");
+      }
+    } catch (error) {
+      console.error("Error deleting test case:", error);
+      toast.error("Failed to delete test case");
+    } finally {
+      setDeletingTestCase(null);
     }
   };
 
@@ -869,10 +996,10 @@ const TestCaseManagement: React.FC = () => {
 
           <div className="overflow-y-auto p-3">
             {folders.map((folder) => (
-              <div key={folder.id} className="mb-1.5">
+              <div key={folder.id} className="group/item relative mb-1.5">
                 <button
                   onClick={() => handleFolderClick(folder.id)}
-                  className={`group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
                     selectedFolder === folder.id
                       ? "bg-blue-50 text-blue-700 shadow-sm"
                       : "text-gray-700 hover:bg-gray-100"
@@ -892,21 +1019,58 @@ const TestCaseManagement: React.FC = () => {
                       className={`text-lg transition-colors ${
                         selectedFolder === folder.id
                           ? "text-blue-600"
-                          : "text-gray-400 group-hover:text-gray-500"
+                          : "text-gray-400 group-hover/item:text-gray-500"
                       }`}
                     />
                     <span className="truncate font-medium">{folder.name}</span>
                   </div>
-                  <span
-                    className={`ml-2 rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors ${
-                      selectedFolder === folder.id
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
-                    }`}
-                  >
-                    {folder.count}
-                  </span>
+                  <div className="flex items-center gap-x-2">
+                    <span
+                      className={`rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors ${
+                        selectedFolder === folder.id
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-gray-100 text-gray-600 group-hover/item:bg-gray-200"
+                      }`}
+                    >
+                      {folder.count}
+                    </span>
+                  </div>
                 </button>
+
+                {/* Folder Menu Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFolderMenuOpen(
+                      folderMenuOpen === folder.id ? null : folder.id
+                    );
+                  }}
+                  className="folder-menu-button absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 opacity-0 transition-opacity hover:bg-gray-200 group-hover/item:opacity-100"
+                  title="Folder options"
+                >
+                  <MdMoreVert className="text-base text-gray-600" />
+                </button>
+
+                {/* Folder Context Menu */}
+                {folderMenuOpen === folder.id && (
+                  <div className="folder-menu absolute right-0 top-full z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (folder.count > 0) {
+                          toast.error("Cannot delete folder with test cases");
+                        } else {
+                          setDeletingFolder(folder.id);
+                          setFolderMenuOpen(null);
+                        }
+                      }}
+                      className="flex w-full items-center gap-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <MdDelete className="text-base" />
+                      <span>Delete Folder</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1286,13 +1450,22 @@ const TestCaseManagement: React.FC = () => {
                               </button>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => startEditing(testCase)}
-                              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                              title="Edit"
-                            >
-                              <MdEdit className="text-lg" />
-                            </button>
+                            <div className="flex items-center justify-center gap-x-2">
+                              <button
+                                onClick={() => startEditing(testCase)}
+                                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                                title="Edit"
+                              >
+                                <MdEdit className="text-lg" />
+                              </button>
+                              <button
+                                onClick={() => setDeletingTestCase(testCase.id)}
+                                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-red-100 hover:text-red-600"
+                                title="Delete"
+                              >
+                                <MdDelete className="text-lg" />
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -1679,6 +1852,120 @@ const TestCaseManagement: React.FC = () => {
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Create Folder
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Folder Confirmation Modal */}
+      {deletingFolder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+            {/* Modal Header */}
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Delete Folder
+              </h2>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              <p className="mb-4 text-sm text-gray-700">
+                Are you sure you want to delete{" "}
+                <strong>
+                  &quot;
+                  {folders.find((f) => f.id === deletingFolder)?.name}&quot;
+                </strong>
+                ?
+              </p>
+
+              <div className="rounded-md bg-red-50 p-3">
+                <p className="text-xs text-red-600">
+                  ⚠️ <strong>Warning:</strong> This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-x-2 border-t border-gray-200 px-6 py-4">
+              <Button
+                customColors
+                onClick={() => {
+                  setDeletingFolder(null);
+                  setFolderMenuOpen(null);
+                }}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                customColors
+                onClick={() => {
+                  if (deletingFolder) {
+                    deleteFolder(deletingFolder);
+                  }
+                }}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              >
+                Delete Folder
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Test Case Confirmation Modal */}
+      {deletingTestCase && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+            {/* Modal Header */}
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Delete Test Case
+              </h2>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              <p className="mb-4 text-sm text-gray-700">
+                Are you sure you want to delete test case{" "}
+                <strong>
+                  &quot;
+                  {testCases.find((tc) => tc.id === deletingTestCase)?.key}
+                  &quot;
+                </strong>
+                ?
+              </p>
+
+              <div className="rounded-md bg-red-50 p-3">
+                <p className="text-xs text-red-600">
+                  ⚠️ <strong>Warning:</strong> This will permanently delete the
+                  test case and all its test steps. This action cannot be
+                  undone.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-x-2 border-t border-gray-200 px-6 py-4">
+              <Button
+                customColors
+                onClick={() => setDeletingTestCase(null)}
+                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                customColors
+                onClick={() => {
+                  if (deletingTestCase) {
+                    deleteTestCase(deletingTestCase);
+                  }
+                }}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              >
+                Delete Test Case
               </Button>
             </div>
           </div>

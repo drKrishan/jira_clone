@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = auth();
@@ -12,12 +12,13 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const { summary, priority, type, reviewStatus, progress, labels } = body;
 
     // Get current test case to increment version
     const currentTestCase = await prisma.testCase.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!currentTestCase) {
@@ -28,7 +29,7 @@ export async function PATCH(
     }
 
     const testCase = await prisma.testCase.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         summary: summary || currentTestCase.summary,
         priority: priority || currentTestCase.priority,
@@ -60,7 +61,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = auth();
@@ -68,8 +69,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
+
     const testCase = await prisma.testCase.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { folder: true },
     });
 
@@ -82,7 +85,7 @@ export async function DELETE(
 
     // Delete test case (steps will be cascaded)
     await prisma.testCase.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     // Update folder count
