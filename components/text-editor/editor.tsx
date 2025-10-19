@@ -31,7 +31,7 @@ function onChange(
 }
 
 export const Editor: React.FC<{
-  action: "description" | "comment";
+  action: "description" | "comment" | "acceptance-criteria";
   content: EditorContentType;
   onSave?: (state: EditorContentType) => void;
   onCancel?: () => void;
@@ -39,6 +39,11 @@ export const Editor: React.FC<{
 }> = ({ action, onSave, onCancel, content, className }) => {
   const { historyState } = useSharedHistoryContext();
   const [jsonState, setJsonState] = useState<EditorContentType>(content);
+
+  const getPlaceholderText = () => {
+    if (action === "acceptance-criteria") return "acceptance criteria";
+    return action;
+  };
 
   return (
     <Fragment>
@@ -58,7 +63,7 @@ export const Editor: React.FC<{
               }
               placeholder={
                 <div className="pointer-events-none absolute top-6 select-none px-3 text-sm text-gray-500">
-                  Add your {action} here...
+                  Add your {getPlaceholderText()} here...
                 </div>
               }
             />

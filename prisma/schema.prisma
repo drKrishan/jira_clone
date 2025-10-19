@@ -46,26 +46,27 @@ enum IssueStatus {
 }
 
 model Issue {
-    id             String      @id @default(uuid())
-    key            String
-    name           String
-    description    String?     @db.Text()
-    status         IssueStatus @default(TODO)
-    type           IssueType   @default(TASK)
-    sprintPosition Float
-    boardPosition  Float       @default(-1)
-    reporterId     String      @default("1")
-    assigneeId     String?
-    parentId       String?
-    sprintId       String?
-    isDeleted      Boolean     @default(false)
-    createdAt      DateTime    @default(now())
-    updatedAt      DateTime    @updatedAt
-    deletedAt      DateTime?
-    sprintColor    String?
-    creatorId      String
-    comments       Comment[]
-    Sprint         Sprint?     @relation(fields: [sprintId], references: [id])
+    id                  String      @id @default(uuid())
+    key                 String
+    name                String
+    description         String?     @db.Text()
+    acceptanceCriteria  String?     @db.Text()
+    status              IssueStatus @default(TODO)
+    type                IssueType   @default(TASK)
+    sprintPosition      Float
+    boardPosition       Float       @default(-1)
+    reporterId          String      @default("1")
+    assigneeId          String?
+    parentId            String?
+    sprintId            String?
+    isDeleted           Boolean     @default(false)
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+    deletedAt           DateTime?
+    sprintColor         String?
+    creatorId           String
+    comments            Comment[]
+    Sprint              Sprint?     @relation(fields: [sprintId], references: [id])
 
     @@unique([key, creatorId])
     @@index([sprintId])

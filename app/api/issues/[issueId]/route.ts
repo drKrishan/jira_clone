@@ -43,6 +43,7 @@ export async function GET(
 const patchIssueBodyValidator = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
+  acceptanceCriteria: z.string().optional(),
   type: z.nativeEnum(IssueType).optional(),
   status: z.nativeEnum(IssueStatus).optional(),
   sprintPosition: z.number().optional(),
@@ -101,6 +102,7 @@ export async function PATCH(req: NextRequest, { params }: ParamsType) {
     data: {
       name: valid.name ?? undefined,
       description: valid.description ?? undefined,
+      acceptanceCriteria: valid.acceptanceCriteria ?? undefined,
       status: valid.status ?? undefined,
       type: valid.type ?? undefined,
       sprintPosition: valid.sprintPosition ?? undefined,

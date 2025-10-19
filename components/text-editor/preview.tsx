@@ -10,11 +10,16 @@ import { type EditorContentType } from "./editor";
 import clsx from "clsx";
 
 export const EditorPreview: React.FC<{
-  action: "description" | "comment";
+  action: "description" | "comment" | "acceptance-criteria";
   content: EditorContentType;
   className?: string;
 }> = ({ action, content, className }) => {
   const [jsonState] = useState<EditorContentType>(content);
+
+  const getPlaceholderText = () => {
+    if (action === "acceptance-criteria") return "acceptance criteria";
+    return action;
+  };
 
   return (
     <EditorComposer readonly={true} jsonState={jsonState}>
@@ -31,7 +36,7 @@ export const EditorPreview: React.FC<{
           }
           placeholder={
             <div className="pointer-events-none absolute left-0 top-0 flex h-full select-none items-center px-1 text-sm text-gray-500">
-              Add your {action} here...
+              Add your {getPlaceholderText()} here...
             </div>
           }
         />

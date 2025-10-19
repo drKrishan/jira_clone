@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Comments } from "./issue-details-info-comments";
 import { IssueMetaInfo } from "./issue-details-info-meta";
 import { Description } from "./issue-details-info-description";
+import { AcceptanceCriteria } from "./issue-details-info-acceptance-criteria";
 import { IssueDetailsInfoAccordion } from "./issue-details-info-accordion";
 import { IssueDetailsInfoActions } from "./issue-details-info-actions";
 import { ChildIssueList } from "./issue-details-info-child-issues";
@@ -133,6 +134,10 @@ const SmallIssueDetailsInfo = React.forwardRef<
         </Button>
       </div>
       <Description issue={issue} key={String(issueKey) + issue.id} />
+      <AcceptanceCriteria
+        issue={issue}
+        key={String(issueKey) + issue.id + "-ac"}
+      />
       {showTestCaseGenerator && (
         <TestCaseGenerator onClose={() => setShowTestCaseGenerator(false)} />
       )}
@@ -199,6 +204,10 @@ const LargeIssueDetails = React.forwardRef<
           variant={"lg"}
         />
         <Description issue={issue} key={String(issueKey) + issue.id} />
+        <AcceptanceCriteria
+          issue={issue}
+          key={String(issueKey) + issue.id + "-ac"}
+        />
         {showTestCaseGenerator && (
           <TestCaseGenerator onClose={() => setShowTestCaseGenerator(false)} />
         )}
@@ -261,7 +270,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }>
   >([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Progress bar states
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -279,7 +288,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setIsGenerating(true);
     setProgress(0);
     setIsCompleted(false);
-    
+
     // Simulate progress
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -582,14 +591,23 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="flex items-center justify-between gap-x-3">
           <Button
             customColors
-            disabled={selectedTestTypes.length === 0 || isGenerating || isCompleted}
+            disabled={
+              selectedTestTypes.length === 0 || isGenerating || isCompleted
+            }
             onClick={handleGenerateTestCases}
             className="flex flex-1 items-center justify-center gap-x-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:from-purple-600 disabled:hover:to-indigo-600"
           >
             <IoSparkles className="text-lg" />
             <span>
-              {isGenerating ? "Generating..." : isCompleted ? "Generated!" : "Generate Test Cases"}
-              {!isGenerating && !isCompleted && selectedTestTypes.length > 0 && ` (${selectedTestTypes.length})`}
+              {isGenerating
+                ? "Generating..."
+                : isCompleted
+                ? "Generated!"
+                : "Generate Test Cases"}
+              {!isGenerating &&
+                !isCompleted &&
+                selectedTestTypes.length > 0 &&
+                ` (${selectedTestTypes.length})`}
             </span>
           </Button>
           <Button
@@ -619,7 +637,8 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               />
             </div>
             <p className="mt-2 text-xs text-purple-700">
-              AI is analyzing your user story and generating comprehensive test cases...
+              AI is analyzing your user story and generating comprehensive test
+              cases...
             </p>
           </div>
         )}
@@ -636,7 +655,8 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   Success! {generatedCount} Test Cases Generated
                 </h4>
                 <p className="mb-3 text-sm text-green-800">
-                  Your test cases have been successfully created and are ready for review.
+                  Your test cases have been successfully created and are ready
+                  for review.
                 </p>
                 <Link
                   href="/project/test-cases"
