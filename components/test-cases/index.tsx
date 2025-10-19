@@ -568,55 +568,59 @@ const TestCaseManagement: React.FC = () => {
   }> = ({ active, icon, label, onClick }) => (
     <button
       onClick={onClick}
-      className={`flex items-center gap-x-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+      className={`border-b-3 group flex items-center gap-x-2.5 px-5 py-3.5 text-sm font-medium transition-all ${
         active
           ? "border-blue-600 text-blue-600"
           : "border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-800"
       }`}
     >
-      {icon}
-      <span>{label}</span>
+      <span
+        className={active ? "" : "transition-transform group-hover:scale-110"}
+      >
+        {icon}
+      </span>
+      <span className="font-semibold">{label}</span>
     </button>
   );
 
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Navigation Tabs */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6">
-        <div className="flex items-center">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-8 shadow-sm">
+        <div className="flex items-center gap-x-1">
           <TabButton
             active={activeTab === "test-case"}
-            icon={<FiFileText className="text-lg" />}
+            icon={<FiFileText className="text-base" />}
             label="Test Case"
             onClick={() => setActiveTab("test-case")}
           />
           <TabButton
             active={activeTab === "test-cycle"}
-            icon={<FiCalendar className="text-lg" />}
+            icon={<FiCalendar className="text-base" />}
             label="Test Cycle"
             onClick={() => setActiveTab("test-cycle")}
           />
           <TabButton
             active={activeTab === "test-plan"}
-            icon={<FiFile className="text-lg" />}
+            icon={<FiFile className="text-base" />}
             label="Test Plan"
             onClick={() => setActiveTab("test-plan")}
           />
           <TabButton
             active={activeTab === "test-report"}
-            icon={<FiBarChart2 className="text-lg" />}
+            icon={<FiBarChart2 className="text-base" />}
             label="Test Report"
             onClick={() => setActiveTab("test-report")}
           />
         </div>
 
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-3">
           <Button
             customColors
-            className="flex items-center gap-x-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:from-purple-700 hover:to-indigo-700"
+            className="flex items-center gap-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:from-purple-700 hover:to-indigo-700 hover:shadow-md"
           >
-            <IoSparkles className="text-lg" />
-            <span>Generate Test Cases</span>
+            <IoSparkles className="text-base" />
+            <span className="font-semibold">Generate Test Cases</span>
           </Button>
           <CreateTestCaseModal
             folderId={selectedFolder}
@@ -629,7 +633,7 @@ const TestCaseManagement: React.FC = () => {
           >
             <Button
               customColors
-              className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className="flex items-center gap-x-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!selectedFolder || folders.length === 0}
             >
               <MdAdd className="text-lg" />
@@ -638,14 +642,14 @@ const TestCaseManagement: React.FC = () => {
           </CreateTestCaseModal>
           <Button
             customColors
-            className="flex items-center gap-x-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="flex items-center gap-x-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50"
           >
-            <MdFileUpload className="text-lg" />
+            <MdFileUpload className="text-base" />
             <span>Import</span>
           </Button>
           <Button
             customColors
-            className="rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 bg-white p-2.5 text-gray-600 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50"
           >
             <MdNotificationsNone className="text-xl" />
           </Button>
@@ -655,19 +659,22 @@ const TestCaseManagement: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar - Folder Tree */}
-        <div className="w-72 border-r border-gray-200 bg-gray-50">
-          <div className="border-b border-gray-200 bg-white p-3">
+        <div className="w-80 border-r border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 bg-white p-4">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Folders
+            </h2>
             <div className="flex items-center gap-x-2">
               <Button
                 customColors
-                className="rounded-md bg-blue-600 p-2 text-white hover:bg-blue-700"
+                className="rounded-lg bg-blue-600 p-2 text-white shadow-sm transition-all hover:bg-blue-700"
                 title="Folder View"
               >
                 <MdFolder className="text-lg" />
               </Button>
               <Button
                 customColors
-                className="rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50"
                 onClick={() => setIsCreateFolderModalOpen(true)}
                 title="Create New Folder"
               >
@@ -675,7 +682,7 @@ const TestCaseManagement: React.FC = () => {
               </Button>
               <Button
                 customColors
-                className="rounded-md border border-gray-300 bg-white p-2 text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 shadow-sm transition-all hover:border-gray-400 hover:bg-gray-50"
                 title="Refresh"
               >
                 <MdRefresh className="text-lg" />
@@ -791,41 +798,41 @@ const TestCaseManagement: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-y-auto p-2">
+          <div className="overflow-y-auto p-3">
             {folders.map((folder) => (
-              <div key={folder.id} className="mb-1">
+              <div key={folder.id} className="mb-1.5">
                 <button
                   onClick={() => handleFolderClick(folder.id)}
-                  className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
+                  className={`group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
                     selectedFolder === folder.id
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-200"
+                      ? "bg-blue-50 text-blue-700 shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <div className="flex items-center gap-x-2">
+                  <div className="flex items-center gap-x-2.5">
                     {folder.count > 0 ? (
                       folder.expanded ? (
-                        <MdKeyboardArrowDown className="text-gray-500" />
+                        <MdKeyboardArrowDown className="text-base text-gray-400" />
                       ) : (
-                        <MdKeyboardArrowRight className="text-gray-500" />
+                        <MdKeyboardArrowRight className="text-base text-gray-400" />
                       )
                     ) : (
                       <span className="w-4" />
                     )}
                     <MdFolder
-                      className={
+                      className={`text-lg transition-colors ${
                         selectedFolder === folder.id
-                          ? "text-blue-500"
-                          : "text-gray-500"
-                      }
+                          ? "text-blue-600"
+                          : "text-gray-400 group-hover:text-gray-500"
+                      }`}
                     />
                     <span className="truncate font-medium">{folder.name}</span>
                   </div>
                   <span
-                    className={`ml-2 rounded px-2 py-0.5 text-xs font-medium ${
+                    className={`ml-2 rounded-md px-2.5 py-0.5 text-xs font-semibold transition-colors ${
                       selectedFolder === folder.id
-                        ? "bg-blue-200 text-blue-700"
-                        : "bg-gray-200 text-gray-600"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
                     }`}
                   >
                     {folder.count}
@@ -839,23 +846,25 @@ const TestCaseManagement: React.FC = () => {
         {/* Main Content - Test Cases Table */}
         <div className="flex flex-1 flex-col overflow-hidden">
           {/* Toolbar */}
-          <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
+          <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3.5 shadow-sm">
             <div className="flex items-center gap-x-4">
-              <div className="flex items-center gap-x-2">
-                <MdFolder className="text-blue-500" />
-                <span className="text-sm font-semibold text-gray-700">
-                  {folders.find((f) => f.id === selectedFolder)?.name ||
-                    "Folder"}
-                </span>
-                <span className="text-sm text-gray-500">
-                  ({testCases.length}{" "}
-                  {testCases.length === 1 ? "test case" : "test cases"})
-                </span>
+              <div className="flex items-center gap-x-3">
+                <MdFolder className="text-xl text-blue-600" />
+                <div className="flex flex-col">
+                  <span className="text-base font-semibold text-gray-800">
+                    {folders.find((f) => f.id === selectedFolder)?.name ||
+                      "Folder"}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {testCases.length}{" "}
+                    {testCases.length === 1 ? "test case" : "test cases"}
+                  </span>
+                </div>
               </div>
               <Button
                 customColors
                 onClick={() => fetchTestCases(selectedFolder)}
-                className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 title="Refresh test cases"
               >
                 <MdRefresh className="text-lg" />
@@ -865,19 +874,19 @@ const TestCaseManagement: React.FC = () => {
             <div className="flex items-center gap-x-2">
               <Button
                 customColors
-                className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
               >
                 <MdSearch className="text-xl" />
               </Button>
               <Button
                 customColors
-                className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
               >
                 <BiFilterAlt className="text-xl" />
               </Button>
               <Button
                 customColors
-                className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
               >
                 <BiDotsHorizontalRounded className="text-xl" />
               </Button>
@@ -885,16 +894,18 @@ const TestCaseManagement: React.FC = () => {
           </div>
 
           {/* Type Filter Bar */}
-          <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
-            <div className="flex items-center gap-x-2">
-              <span className="text-xs font-semibold text-gray-600">Type:</span>
+          <div className="border-b border-gray-200 bg-white px-6 py-3">
+            <div className="flex items-center gap-x-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                Type:
+              </span>
               <Button
                 customColors
                 onClick={() => setTypeFilter("all")}
-                className={`rounded-md px-3 py-1 text-xs ${
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all ${
                   typeFilter === "all"
-                    ? "bg-blue-100 font-semibold text-blue-700"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 All
@@ -902,10 +913,10 @@ const TestCaseManagement: React.FC = () => {
               <Button
                 customColors
                 onClick={() => setTypeFilter("FUNCTIONAL")}
-                className={`rounded-md px-3 py-1 text-xs ${
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all ${
                   typeFilter === "FUNCTIONAL"
-                    ? "bg-blue-100 font-semibold text-blue-700"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Functional
@@ -913,10 +924,10 @@ const TestCaseManagement: React.FC = () => {
               <Button
                 customColors
                 onClick={() => setTypeFilter("NON_FUNCTIONAL")}
-                className={`rounded-md px-3 py-1 text-xs ${
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all ${
                   typeFilter === "NON_FUNCTIONAL"
-                    ? "bg-purple-100 font-semibold text-purple-700"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
+                    ? "bg-purple-600 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Non-Functional
@@ -924,10 +935,10 @@ const TestCaseManagement: React.FC = () => {
               <Button
                 customColors
                 onClick={() => setTypeFilter("PERFORMANCE")}
-                className={`rounded-md px-3 py-1 text-xs ${
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all ${
                   typeFilter === "PERFORMANCE"
-                    ? "bg-orange-100 font-semibold text-orange-700"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
+                    ? "bg-orange-600 text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Performance
@@ -936,53 +947,53 @@ const TestCaseManagement: React.FC = () => {
           </div>
 
           {/* Test Cases Table */}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto bg-gray-50">
             <table className="w-full">
-              <thead className="sticky top-0 bg-gray-50">
-                <tr className="border-b border-gray-200">
-                  <th className="w-12 px-4 py-3">
+              <thead className="sticky top-0 bg-white shadow-sm">
+                <tr className="border-b-2 border-gray-200">
+                  <th className="w-12 px-6 py-4">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
                     />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
                       <span>Key</span>
-                      <BiSortAlt2 className="text-sm" />
+                      <BiSortAlt2 className="text-sm text-gray-400" />
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
                       <span>Summary</span>
-                      <BiSortAlt2 className="text-sm" />
+                      <BiSortAlt2 className="text-sm text-gray-400" />
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                     Version
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                     Priority
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
                       <span>Type</span>
-                      <BiSortAlt2 className="text-sm" />
+                      <BiSortAlt2 className="text-sm text-gray-400" />
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
                       <span>Review Status</span>
-                      <BiSortAlt2 className="text-sm" />
+                      <BiSortAlt2 className="text-sm text-gray-400" />
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
                     <div className="flex items-center gap-x-1">
                       <span>Progress</span>
-                      <BiSortAlt2 className="text-sm" />
+                      <BiSortAlt2 className="text-sm text-gray-400" />
                     </div>
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-600">
+                  <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
                     Actions
                   </th>
                 </tr>
@@ -990,20 +1001,31 @@ const TestCaseManagement: React.FC = () => {
               <tbody className="bg-white">
                 {loading ? (
                   <tr>
-                    <td
-                      colSpan={9}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      Loading test cases...
+                    <td colSpan={9} className="px-6 py-16 text-center">
+                      <div className="flex flex-col items-center gap-y-3">
+                        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+                        <p className="text-sm font-medium text-gray-600">
+                          Loading test cases...
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 ) : testCases.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={9}
-                      className="px-4 py-8 text-center text-gray-500"
-                    >
-                      No test cases found. Create your first test case!
+                    <td colSpan={9} className="px-6 py-16 text-center">
+                      <div className="flex flex-col items-center gap-y-3">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 text-4xl">
+                          📝
+                        </div>
+                        <div>
+                          <p className="mb-1 text-base font-semibold text-gray-700">
+                            No test cases found
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Create your first test case to get started!
+                          </p>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -1014,25 +1036,25 @@ const TestCaseManagement: React.FC = () => {
                     )
                     .map((testCase) => (
                       <React.Fragment key={testCase.id}>
-                        <tr className="border-b border-gray-100 transition-colors hover:bg-gray-50">
-                          <td className="px-4 py-3">
+                        <tr className="group border-b border-gray-200 transition-colors hover:bg-blue-50/30">
+                          <td className="px-6 py-4">
                             <button
                               onClick={() => toggleTestCase(testCase.id)}
-                              className="text-gray-400 hover:text-gray-600"
+                              className="rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
                             >
                               {testCase.expanded ? (
-                                <MdKeyboardArrowDown className="text-lg" />
+                                <MdKeyboardArrowDown className="text-xl" />
                               ) : (
-                                <MdKeyboardArrowRight className="text-lg" />
+                                <MdKeyboardArrowRight className="text-xl" />
                               )}
                             </button>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="cursor-pointer font-medium text-blue-600 hover:underline">
+                          <td className="px-6 py-4">
+                            <span className="cursor-pointer font-semibold text-blue-600 transition-colors hover:text-blue-700 hover:underline">
                               {testCase.key}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-6 py-4">
                             {editingTestCase === testCase.id ? (
                               <input
                                 type="text"
@@ -1043,20 +1065,20 @@ const TestCaseManagement: React.FC = () => {
                                     summary: e.target.value,
                                   })
                                 }
-                                className="w-full rounded border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                             ) : (
-                              <span className="text-sm text-gray-900">
+                              <span className="text-sm font-medium text-gray-800">
                                 {testCase.summary}
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+                          <td className="px-6 py-4 text-center">
+                            <span className="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">
                               v{testCase.version}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-6 py-4 text-center">
                             {editingTestCase === testCase.id ? (
                               <select
                                 value={editForm.priority}
@@ -1066,7 +1088,7 @@ const TestCaseManagement: React.FC = () => {
                                     priority: e.target.value,
                                   })
                                 }
-                                className="rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="CRITICAL">Critical ↑↑</option>
                                 <option value="HIGH">High ↑</option>
@@ -1076,7 +1098,7 @@ const TestCaseManagement: React.FC = () => {
                               </select>
                             ) : (
                               <span
-                                className={`inline-flex items-center rounded px-2 py-1 text-sm font-bold ${
+                                className={`inline-flex items-center rounded-md px-2.5 py-1.5 text-sm font-bold ${
                                   getPriorityIcon(testCase.priority).color
                                 } ${getPriorityIcon(testCase.priority).bg}`}
                               >
@@ -1084,7 +1106,7 @@ const TestCaseManagement: React.FC = () => {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-6 py-4">
                             {editingTestCase === testCase.id ? (
                               <select
                                 value={editForm.type}
@@ -1094,7 +1116,7 @@ const TestCaseManagement: React.FC = () => {
                                     type: e.target.value,
                                   })
                                 }
-                                className="rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="FUNCTIONAL">Functional</option>
                                 <option value="NON_FUNCTIONAL">
@@ -1104,7 +1126,7 @@ const TestCaseManagement: React.FC = () => {
                               </select>
                             ) : (
                               <span
-                                className={`inline-block rounded border px-3 py-1 text-xs font-medium ${getTypeColor(
+                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getTypeColor(
                                   testCase.type
                                 )}`}
                               >
@@ -1112,7 +1134,7 @@ const TestCaseManagement: React.FC = () => {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-6 py-4">
                             {editingTestCase === testCase.id ? (
                               <select
                                 value={editForm.reviewStatus}
@@ -1122,7 +1144,7 @@ const TestCaseManagement: React.FC = () => {
                                     reviewStatus: e.target.value,
                                   })
                                 }
-                                className="rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="NEW">New</option>
                                 <option value="APPROVED">Approved</option>
@@ -1130,7 +1152,7 @@ const TestCaseManagement: React.FC = () => {
                               </select>
                             ) : (
                               <span
-                                className={`inline-block rounded border px-3 py-1 text-xs font-medium ${getReviewStatusColor(
+                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getReviewStatusColor(
                                   testCase.reviewStatus
                                 )}`}
                               >
@@ -1138,7 +1160,7 @@ const TestCaseManagement: React.FC = () => {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-6 py-4">
                             {editingTestCase === testCase.id ? (
                               <select
                                 value={editForm.progress}
@@ -1148,7 +1170,7 @@ const TestCaseManagement: React.FC = () => {
                                     progress: e.target.value,
                                   })
                                 }
-                                className="rounded border border-gray-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="TODO">To Do</option>
                                 <option value="IN_PROGRESS">In Progress</option>
@@ -1157,7 +1179,7 @@ const TestCaseManagement: React.FC = () => {
                               </select>
                             ) : (
                               <span
-                                className={`inline-block rounded border px-3 py-1 text-xs font-medium ${getProgressColor(
+                                className={`inline-block rounded-md border px-3 py-1.5 text-xs font-semibold ${getProgressColor(
                                   testCase.progress
                                 )}`}
                               >
@@ -1165,19 +1187,19 @@ const TestCaseManagement: React.FC = () => {
                               </span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-6 py-4 text-center">
                             {editingTestCase === testCase.id ? (
                               <div className="flex items-center justify-center gap-x-2">
                                 <button
                                   onClick={() => saveTestCase(testCase.id)}
-                                  className="rounded bg-blue-600 p-1 text-white hover:bg-blue-700"
+                                  className="rounded-lg bg-blue-600 p-2 text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
                                   title="Save"
                                 >
                                   <MdSave className="text-lg" />
                                 </button>
                                 <button
                                   onClick={cancelEditing}
-                                  className="rounded bg-gray-300 p-1 text-gray-700 hover:bg-gray-400"
+                                  className="rounded-lg bg-gray-200 p-2 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
                                   title="Cancel"
                                 >
                                   <MdClose className="text-lg" />
@@ -1186,7 +1208,7 @@ const TestCaseManagement: React.FC = () => {
                             ) : (
                               <button
                                 onClick={() => startEditing(testCase)}
-                                className="rounded p-1 text-gray-600 hover:bg-gray-200"
+                                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                                 title="Edit"
                               >
                                 <MdEdit className="text-lg" />
@@ -1198,44 +1220,50 @@ const TestCaseManagement: React.FC = () => {
                         {/* Expanded Test Steps */}
                         {testCase.expanded && (
                           <tr>
-                            <td colSpan={9} className="bg-gray-50 px-4 py-4">
-                              <div className="rounded-lg border border-gray-200 bg-white p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                  <h3 className="flex items-center gap-x-2 text-sm font-semibold text-gray-700">
-                                    <span className="text-blue-600">📋</span>
-                                    Test Steps ({testCase.steps?.length || 0})
+                            <td
+                              colSpan={9}
+                              className="bg-gradient-to-br from-blue-50/20 to-gray-50/40 px-6 py-5"
+                            >
+                              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                                <div className="mb-4 flex items-center justify-between">
+                                  <h3 className="flex items-center gap-x-2.5 text-base font-semibold text-gray-800">
+                                    <span className="text-xl">📋</span>
+                                    <span>Test Steps</span>
+                                    <span className="ml-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                                      {testCase.steps?.length || 0}
+                                    </span>
                                   </h3>
                                   <button
                                     onClick={() =>
                                       setAddingStepToTestCase(testCase.id)
                                     }
-                                    className="flex items-center gap-x-1 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                                    className="flex items-center gap-x-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
                                   >
-                                    <MdAdd className="text-sm" />
+                                    <MdAdd className="text-base" />
                                     Add Step
                                   </button>
                                 </div>
 
                                 {testCase.steps && testCase.steps.length > 0 ? (
                                   <table className="w-full">
-                                    <thead className="border-b border-gray-200 bg-gray-50">
+                                    <thead className="border-b-2 border-gray-200 bg-gray-50/80">
                                       <tr>
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           #
                                         </th>
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           Step Summary
                                         </th>
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           Pre Condition
                                         </th>
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           Test Data
                                         </th>
-                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           Expected Result
                                         </th>
-                                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-600">
+                                        <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-500">
                                           Actions
                                         </th>
                                       </tr>
@@ -1244,14 +1272,14 @@ const TestCaseManagement: React.FC = () => {
                                       {testCase.steps.map((step) => (
                                         <tr
                                           key={step.id}
-                                          className="border-b border-gray-100"
+                                          className="group border-b border-gray-100 transition-colors hover:bg-gray-50/50"
                                         >
-                                          <td className="px-3 py-3 text-center">
-                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                                          <td className="px-4 py-4 text-center">
+                                            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
                                               {step.stepNumber}
                                             </span>
                                           </td>
-                                          <td className="px-3 py-3 text-sm text-gray-900">
+                                          <td className="px-4 py-4 text-sm text-gray-800">
                                             {editingStep === step.id ? (
                                               <textarea
                                                 value={editStepForm.summary}
@@ -1261,14 +1289,16 @@ const TestCaseManagement: React.FC = () => {
                                                     summary: e.target.value,
                                                   })
                                                 }
-                                                className="w-full rounded border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 rows={2}
                                               />
                                             ) : (
-                                              step.summary
+                                              <span className="font-medium">
+                                                {step.summary}
+                                              </span>
                                             )}
                                           </td>
-                                          <td className="px-3 py-3 text-sm text-gray-600">
+                                          <td className="px-4 py-4 text-sm text-gray-600">
                                             {editingStep === step.id ? (
                                               <textarea
                                                 value={
@@ -1281,14 +1311,16 @@ const TestCaseManagement: React.FC = () => {
                                                       e.target.value,
                                                   })
                                                 }
-                                                className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 rows={2}
                                               />
                                             ) : (
-                                              step.preCondition || "-"
+                                              <span className="text-gray-600">
+                                                {step.preCondition || "-"}
+                                              </span>
                                             )}
                                           </td>
-                                          <td className="px-3 py-3 text-sm text-gray-600">
+                                          <td className="px-4 py-4 text-sm text-gray-600">
                                             {editingStep === step.id ? (
                                               <textarea
                                                 value={editStepForm.testData}
@@ -1298,14 +1330,16 @@ const TestCaseManagement: React.FC = () => {
                                                     testData: e.target.value,
                                                   })
                                                 }
-                                                className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 rows={2}
                                               />
                                             ) : (
-                                              step.testData || "-"
+                                              <span className="text-gray-600">
+                                                {step.testData || "-"}
+                                              </span>
                                             )}
                                           </td>
-                                          <td className="px-3 py-3 text-sm text-gray-900">
+                                          <td className="px-4 py-4 text-sm text-gray-800">
                                             {editingStep === step.id ? (
                                               <textarea
                                                 value={
@@ -1318,16 +1352,18 @@ const TestCaseManagement: React.FC = () => {
                                                       e.target.value,
                                                   })
                                                 }
-                                                className="w-full rounded border border-blue-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-lg border border-blue-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 rows={2}
                                               />
                                             ) : (
-                                              step.expectedResult
+                                              <span className="font-medium">
+                                                {step.expectedResult}
+                                              </span>
                                             )}
                                           </td>
-                                          <td className="px-3 py-3 text-center">
+                                          <td className="px-4 py-4 text-center">
                                             {editingStep === step.id ? (
-                                              <div className="flex items-center justify-center gap-x-1">
+                                              <div className="flex items-center justify-center gap-x-2">
                                                 <button
                                                   onClick={() =>
                                                     saveStep(
@@ -1335,29 +1371,29 @@ const TestCaseManagement: React.FC = () => {
                                                       step.id
                                                     )
                                                   }
-                                                  className="rounded bg-green-600 p-1 text-white hover:bg-green-700"
+                                                  className="rounded-lg bg-green-600 p-1.5 text-white shadow-sm transition-all hover:bg-green-700"
                                                   title="Save"
                                                 >
-                                                  <MdSave className="text-sm" />
+                                                  <MdSave className="text-base" />
                                                 </button>
                                                 <button
                                                   onClick={cancelEditingStep}
-                                                  className="rounded bg-gray-300 p-1 text-gray-700 hover:bg-gray-400"
+                                                  className="rounded-lg bg-gray-200 p-1.5 text-gray-700 shadow-sm transition-all hover:bg-gray-300"
                                                   title="Cancel"
                                                 >
-                                                  <MdClose className="text-sm" />
+                                                  <MdClose className="text-base" />
                                                 </button>
                                               </div>
                                             ) : (
-                                              <div className="flex items-center justify-center gap-x-1">
+                                              <div className="flex items-center justify-center gap-x-2">
                                                 <button
                                                   onClick={() =>
                                                     startEditingStep(step)
                                                   }
-                                                  className="rounded p-1 text-blue-600 hover:bg-blue-50"
+                                                  className="rounded-lg p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
                                                   title="Edit Step"
                                                 >
-                                                  <MdEdit className="text-sm" />
+                                                  <MdEdit className="text-base" />
                                                 </button>
                                                 <button
                                                   onClick={() =>
@@ -1366,10 +1402,10 @@ const TestCaseManagement: React.FC = () => {
                                                       step.id
                                                     )
                                                   }
-                                                  className="rounded p-1 text-red-600 hover:bg-red-50"
+                                                  className="rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
                                                   title="Delete Step"
                                                 >
-                                                  <MdDelete className="text-sm" />
+                                                  <MdDelete className="text-base" />
                                                 </button>
                                               </div>
                                             )}
@@ -1379,8 +1415,11 @@ const TestCaseManagement: React.FC = () => {
                                     </tbody>
                                   </table>
                                 ) : (
-                                  <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-8 text-center">
-                                    <p className="mb-2 text-sm text-gray-600">
+                                  <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-gray-50 to-blue-50/20 py-12 text-center">
+                                    <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-3xl">
+                                      📋
+                                    </div>
+                                    <p className="mb-2 text-sm font-medium text-gray-700">
                                       No test steps added yet
                                     </p>
                                     <p className="text-xs text-gray-500">
@@ -1392,14 +1431,18 @@ const TestCaseManagement: React.FC = () => {
 
                                 {/* Add Step Form */}
                                 {addingStepToTestCase === testCase.id && (
-                                  <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-                                    <h4 className="mb-3 text-sm font-semibold text-gray-700">
+                                  <div className="mt-5 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
+                                    <h4 className="mb-4 flex items-center gap-x-2 text-base font-semibold text-gray-800">
+                                      <span className="text-blue-600">➕</span>
                                       Add New Step
                                     </h4>
-                                    <div className="grid grid-cols-4 gap-3">
+                                    <div className="grid grid-cols-4 gap-4">
                                       <div>
-                                        <label className="mb-1 block text-xs font-medium text-gray-700">
-                                          Step Details *
+                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                          Step Details{" "}
+                                          <span className="text-red-500">
+                                            *
+                                          </span>
                                         </label>
                                         <textarea
                                           value={newStep.summary}
@@ -1409,13 +1452,13 @@ const TestCaseManagement: React.FC = () => {
                                               summary: e.target.value,
                                             })
                                           }
-                                          placeholder="Enter Step Details"
-                                          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Enter step details..."
+                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                           rows={3}
                                         />
                                       </div>
                                       <div>
-                                        <label className="mb-1 block text-xs font-medium text-gray-700">
+                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
                                           Pre Condition
                                         </label>
                                         <textarea
@@ -1426,13 +1469,13 @@ const TestCaseManagement: React.FC = () => {
                                               preCondition: e.target.value,
                                             })
                                           }
-                                          placeholder="Enter Pre Condition"
-                                          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Enter pre condition..."
+                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                           rows={3}
                                         />
                                       </div>
                                       <div>
-                                        <label className="mb-1 block text-xs font-medium text-gray-700">
+                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
                                           Test Data
                                         </label>
                                         <textarea
@@ -1443,14 +1486,17 @@ const TestCaseManagement: React.FC = () => {
                                               testData: e.target.value,
                                             })
                                           }
-                                          placeholder="Enter Test Data"
-                                          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Enter test data..."
+                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                           rows={3}
                                         />
                                       </div>
                                       <div>
-                                        <label className="mb-1 block text-xs font-medium text-gray-700">
-                                          Expected Result *
+                                        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                          Expected Result{" "}
+                                          <span className="text-red-500">
+                                            *
+                                          </span>
                                         </label>
                                         <textarea
                                           value={newStep.expectedResult}
@@ -1460,13 +1506,13 @@ const TestCaseManagement: React.FC = () => {
                                               expectedResult: e.target.value,
                                             })
                                           }
-                                          placeholder="Enter Expected Result"
-                                          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Enter expected result..."
+                                          className="w-full rounded-lg border-2 border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                           rows={3}
                                         />
                                       </div>
                                     </div>
-                                    <div className="mt-3 flex justify-end gap-x-2">
+                                    <div className="mt-4 flex justify-end gap-x-3">
                                       <button
                                         onClick={() => {
                                           setAddingStepToTestCase(null);
@@ -1477,15 +1523,15 @@ const TestCaseManagement: React.FC = () => {
                                             expectedResult: "",
                                           });
                                         }}
-                                        className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                        className="rounded-lg border-2 border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
                                       >
                                         Cancel
                                       </button>
                                       <button
                                         onClick={() => addStep(testCase.id)}
-                                        className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                        className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow"
                                       >
-                                        Add
+                                        Add Step
                                       </button>
                                     </div>
                                   </div>
