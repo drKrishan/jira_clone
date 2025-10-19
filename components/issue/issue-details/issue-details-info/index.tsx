@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useRef, useState, useEffect } from "react";
 import { NotImplemented } from "@/components/not-implemented";
 import { LightningIcon } from "@/components/svgs";
 import { IssueTitle } from "../../issue-title";
@@ -18,6 +18,7 @@ import { useContainerWidth } from "@/hooks/use-container-width";
 import Split from "react-split";
 import "@/styles/split.css";
 import { IoSparkles } from "react-icons/io5";
+import Link from "next/link";
 import {
   FaCheckCircle,
   FaCog,
@@ -260,11 +261,39 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }>
   >([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Progress bar states
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [generatedCount, setGeneratedCount] = useState(0);
 
   const toggleTestType = (type: string) => {
     setSelectedTestTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
+  };
+
+  // Handle test case generation
+  const handleGenerateTestCases = () => {
+    setIsGenerating(true);
+    setProgress(0);
+    setIsCompleted(false);
+    
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsCompleted(true);
+          setGeneratedCount(15);
+          toast.success("Test cases generated successfully!");
+          return 100;
+        }
+        // Increment progress with variable speed for realistic effect
+        return prev + Math.random() * 15;
+      });
+    }, 300);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -553,13 +582,14 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="flex items-center justify-between gap-x-3">
           <Button
             customColors
-            disabled={selectedTestTypes.length === 0}
+            disabled={selectedTestTypes.length === 0 || isGenerating || isCompleted}
+            onClick={handleGenerateTestCases}
             className="flex flex-1 items-center justify-center gap-x-2 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-purple-700 hover:to-indigo-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:from-purple-600 disabled:hover:to-indigo-600"
           >
             <IoSparkles className="text-lg" />
             <span>
-              Generate Test Cases
-              {selectedTestTypes.length > 0 && ` (${selectedTestTypes.length})`}
+              {isGenerating ? "Generating..." : isCompleted ? "Generated!" : "Generate Test Cases"}
+              {!isGenerating && !isCompleted && selectedTestTypes.length > 0 && ` (${selectedTestTypes.length})`}
             </span>
           </Button>
           <Button
@@ -570,6 +600,55 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             Cancel
           </Button>
         </div>
+
+        {/* Progress Bar */}
+        {isGenerating && (
+          <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-semibold text-purple-900">
+                Generating test cases...
+              </span>
+              <span className="text-sm font-bold text-purple-700">
+                {Math.round(progress)}%
+              </span>
+            </div>
+            <div className="h-3 w-full overflow-hidden rounded-full bg-purple-200">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-purple-700">
+              AI is analyzing your user story and generating comprehensive test cases...
+            </p>
+          </div>
+        )}
+
+        {/* Completion Message */}
+        {isCompleted && (
+          <div className="mt-4 rounded-lg border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+            <div className="flex items-start gap-x-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
+                <FaCheckCircle className="text-xl text-white" />
+              </div>
+              <div className="flex-1">
+                <h4 className="mb-1 text-base font-bold text-green-900">
+                  Success! {generatedCount} Test Cases Generated
+                </h4>
+                <p className="mb-3 text-sm text-green-800">
+                  Your test cases have been successfully created and are ready for review.
+                </p>
+                <Link
+                  href="/project/test-cases"
+                  className="inline-flex items-center gap-x-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 hover:shadow-lg"
+                >
+                  <FaCheckCircle className="text-base" />
+                  <span>View Test Cases</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
