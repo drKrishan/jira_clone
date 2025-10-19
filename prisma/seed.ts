@@ -128,6 +128,11 @@ async function main() {
   await initDefaultIssueComments("");
   // Create default sprints
   await initDefaultSprints("");
+
+  // Seed test cases
+  console.log("Seeding test cases...");
+  const { seedTestCases } = require("./seed-test-cases");
+  await seedTestCases();
 }
 main()
   .then(async () => {

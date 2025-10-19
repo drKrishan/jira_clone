@@ -121,3 +121,76 @@ model DefaultUser {
     email  String
     avatar String?
 }
+
+enum TestCasePriority {
+    CRITICAL
+    HIGH
+    MEDIUM
+    NORMAL
+    LOW
+}
+
+enum TestCaseType {
+    FUNCTIONAL
+    NON_FUNCTIONAL
+    PERFORMANCE
+}
+
+enum TestCaseReviewStatus {
+    NEW
+    APPROVED
+    REJECTED
+}
+
+enum TestCaseProgress {
+    TODO
+    IN_PROGRESS
+    DONE
+    CANCELLED
+}
+
+model TestFolder {
+    id          String     @id @default(uuid())
+    name        String
+    count       Int        @default(0)
+    projectId   String
+    parentId    String?
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+    creatorId   String
+    testCases   TestCase[]
+}
+
+model TestCase {
+    id           String                @id @default(uuid())
+    key          String                @unique
+    summary      String
+    version      Int                   @default(1)
+    priority     TestCasePriority      @default(MEDIUM)
+    type         TestCaseType          @default(FUNCTIONAL)
+    reviewStatus TestCaseReviewStatus  @default(NEW)
+    progress     TestCaseProgress      @default(TODO)
+    labels       String[]
+    folderId     String
+    folder       TestFolder            @relation(fields: [folderId], references: [id])
+    createdAt    DateTime              @default(now())
+    updatedAt    DateTime              @updatedAt
+    creatorId    String
+    steps        TestStep[]
+
+    @@index([folderId])
+}
+
+model TestStep {
+    id             String    @id @default(uuid())
+    stepNumber     Int
+    summary        String    @db.Text()
+    testData       String?   @db.Text()
+    expectedResult String    @db.Text()
+    testCaseId     String
+    testCase       TestCase  @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+
+    @@index([testCaseId])
+}
