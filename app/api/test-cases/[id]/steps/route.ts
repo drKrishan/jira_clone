@@ -37,9 +37,14 @@ export async function POST(
     console.log("Creating step for test case:", params.id);
 
     const body = await request.json();
-    const { summary, testData, expectedResult } = body;
+    const { summary, preCondition, testData, expectedResult } = body;
 
-    console.log("Step data:", { summary, testData, expectedResult });
+    console.log("Step data:", {
+      summary,
+      preCondition,
+      testData,
+      expectedResult,
+    });
 
     if (!summary || !expectedResult) {
       return NextResponse.json(
@@ -61,6 +66,7 @@ export async function POST(
       data: {
         stepNumber: newStepNumber,
         summary,
+        preCondition: preCondition || "",
         testData: testData || "",
         expectedResult,
         testCaseId: params.id,

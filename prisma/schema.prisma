@@ -185,6 +185,7 @@ model TestStep {
     id             String    @id @default(uuid())
     stepNumber     Int
     summary        String    @db.Text()
+    preCondition   String?   @db.Text()
     testData       String?   @db.Text()
     expectedResult String    @db.Text()
     testCaseId     String

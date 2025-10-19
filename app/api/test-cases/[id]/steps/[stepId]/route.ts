@@ -14,12 +14,13 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { summary, testData, expectedResult } = body;
+    const { summary, preCondition, testData, expectedResult } = body;
 
     const step = await prisma.testStep.update({
       where: { id: params.stepId },
       data: {
         summary: summary,
+        preCondition: preCondition || "",
         testData: testData || "",
         expectedResult: expectedResult,
       },

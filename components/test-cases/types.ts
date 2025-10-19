@@ -3,7 +3,8 @@ export interface TestStep {
   id: string;
   stepNumber: number;
   summary: string;
-  testData: string;
+  preCondition?: string;
+  testData?: string;
   expectedResult: string;
 }
 

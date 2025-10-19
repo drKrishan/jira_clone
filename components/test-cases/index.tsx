@@ -31,12 +31,14 @@ import {
   MdCheck,
 } from "react-icons/md";
 import toast from "react-hot-toast";
+import { CreateTestCaseModal } from "@/components/modals/create-test-case";
 
 interface TestStep {
   id: string;
   stepNumber: number;
   summary: string;
-  testData: string;
+  preCondition?: string;
+  testData?: string;
   expectedResult: string;
 }
 
@@ -98,11 +100,13 @@ const TestCaseManagement: React.FC = () => {
   >(null);
   const [newStep, setNewStep] = useState({
     summary: "",
+    preCondition: "",
     testData: "",
     expectedResult: "",
   });
   const [editStepForm, setEditStepForm] = useState({
     summary: "",
+    preCondition: "",
     testData: "",
     expectedResult: "",
   });
@@ -126,13 +130,17 @@ const TestCaseManagement: React.FC = () => {
     }
   };
 
-  const fetchTestCases = async () => {
+  const fetchTestCases = async (folderId?: string) => {
     try {
       setLoading(true);
-      const response = await fetch("/api/test-cases");
+      const url = folderId
+        ? `/api/test-cases?folderId=${folderId}`
+        : "/api/test-cases";
+      const response = await fetch(url);
       const data = await response.json();
       console.log("Fetched test cases:", data);
       console.log("Number of test cases:", data.length);
+      console.log("For folder:", folderId || "all");
       setTestCases(
         data.map((tc: any) => ({
           ...tc,
@@ -175,6 +183,21 @@ const TestCaseManagement: React.FC = () => {
           : folder
       )
     );
+  };
+
+  const handleFolderClick = (folderId: string) => {
+    setSelectedFolder(folderId);
+    // Fetch test cases for the selected folder
+    if (folderId === "all") {
+      fetchTestCases(); // Fetch all test cases
+    } else {
+      fetchTestCases(folderId); // Fetch test cases for specific folder
+    }
+    // Toggle folder expansion if it has items
+    const folder = folders.find((f) => f.id === folderId);
+    if (folder && folder.count > 0) {
+      toggleFolder(folderId);
+    }
   };
 
   const toggleTestCase = (testCaseId: string) => {
@@ -271,7 +294,12 @@ const TestCaseManagement: React.FC = () => {
               : tc
           )
         );
-        setNewStep({ summary: "", testData: "", expectedResult: "" });
+        setNewStep({
+          summary: "",
+          preCondition: "",
+          testData: "",
+          expectedResult: "",
+        });
         setAddingStepToTestCase(null);
         toast.success("Step added successfully!");
       } else {
@@ -292,14 +320,20 @@ const TestCaseManagement: React.FC = () => {
     setEditingStep(step.id);
     setEditStepForm({
       summary: step.summary,
-      testData: step.testData,
+      preCondition: step.preCondition || "",
+      testData: step.testData || "",
       expectedResult: step.expectedResult,
     });
   };
 
   const cancelEditingStep = () => {
     setEditingStep(null);
-    setEditStepForm({ summary: "", testData: "", expectedResult: "" });
+    setEditStepForm({
+      summary: "",
+      preCondition: "",
+      testData: "",
+      expectedResult: "",
+    });
   };
 
   const saveStep = async (testCaseId: string, stepId: string) => {
@@ -582,13 +616,30 @@ const TestCaseManagement: React.FC = () => {
             <IoSparkles className="text-lg" />
             <span>Generate Test Cases</span>
           </Button>
-          <Button
-            customColors
-            className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          <CreateTestCaseModal
+            folderId={
+              selectedFolder === "all" ? folders[0]?.id || "" : selectedFolder
+            }
+            folderName={
+              selectedFolder === "all"
+                ? folders[0]?.name || "Default Folder"
+                : folders.find((f) => f.id === selectedFolder)?.name || "Folder"
+            }
+            onTestCaseCreated={() => {
+              fetchTestCases(
+                selectedFolder === "all" ? undefined : selectedFolder
+              );
+            }}
           >
-            <MdAdd className="text-lg" />
-            <span>New</span>
-          </Button>
+            <Button
+              customColors
+              className="flex items-center gap-x-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              disabled={selectedFolder === "all" && folders.length === 0}
+            >
+              <MdAdd className="text-lg" />
+              <span>New</span>
+            </Button>
+          </CreateTestCaseModal>
           <Button
             customColors
             className="flex items-center gap-x-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -745,13 +796,34 @@ const TestCaseManagement: React.FC = () => {
           </div>
 
           <div className="overflow-y-auto p-2">
+            {/* All Test Cases - Default View */}
+            <div className="mb-1">
+              <button
+                onClick={() => handleFolderClick("all")}
+                className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
+                  selectedFolder === "all"
+                    ? "bg-blue-100 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <div className="flex items-center gap-x-2">
+                  <span className="w-4" />
+                  <MdFolder className="text-blue-500" />
+                  <span className="truncate font-medium">All Test Cases</span>
+                </div>
+                <span className="ml-2 rounded bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-700">
+                  {testCases.length}
+                </span>
+              </button>
+            </div>
+
+            {/* Separator */}
+            <div className="my-2 border-t border-gray-200"></div>
+
             {folders.map((folder) => (
               <div key={folder.id} className="mb-1">
                 <button
-                  onClick={() => {
-                    setSelectedFolder(folder.id);
-                    if (folder.count > 0) toggleFolder(folder.id);
-                  }}
+                  onClick={() => handleFolderClick(folder.id)}
                   className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition-colors ${
                     selectedFolder === folder.id
                       ? "bg-blue-100 text-blue-700"
@@ -785,12 +857,28 @@ const TestCaseManagement: React.FC = () => {
           {/* Toolbar */}
           <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
             <div className="flex items-center gap-x-4">
-              <span className="text-sm text-gray-600">
-                1 - 20 Of <span className="font-semibold">234</span>
-              </span>
+              <div className="flex items-center gap-x-2">
+                <MdFolder className="text-blue-500" />
+                <span className="text-sm font-semibold text-gray-700">
+                  {selectedFolder === "all"
+                    ? "All Test Cases"
+                    : folders.find((f) => f.id === selectedFolder)?.name ||
+                      "Folder"}
+                </span>
+                <span className="text-sm text-gray-500">
+                  ({testCases.length}{" "}
+                  {testCases.length === 1 ? "test case" : "test cases"})
+                </span>
+              </div>
               <Button
                 customColors
+                onClick={() =>
+                  fetchTestCases(
+                    selectedFolder === "all" ? undefined : selectedFolder
+                  )
+                }
                 className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
+                title="Refresh test cases"
               >
                 <MdRefresh className="text-lg" />
               </Button>
@@ -1161,6 +1249,9 @@ const TestCaseManagement: React.FC = () => {
                                           Step Summary
                                         </th>
                                         <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
+                                          Pre Condition
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
                                           Test Data
                                         </th>
                                         <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">
@@ -1197,6 +1288,26 @@ const TestCaseManagement: React.FC = () => {
                                               />
                                             ) : (
                                               step.summary
+                                            )}
+                                          </td>
+                                          <td className="px-3 py-3 text-sm text-gray-600">
+                                            {editingStep === step.id ? (
+                                              <textarea
+                                                value={
+                                                  editStepForm.preCondition
+                                                }
+                                                onChange={(e) =>
+                                                  setEditStepForm({
+                                                    ...editStepForm,
+                                                    preCondition:
+                                                      e.target.value,
+                                                  })
+                                                }
+                                                className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                rows={2}
+                                              />
+                                            ) : (
+                                              step.preCondition || "-"
                                             )}
                                           </td>
                                           <td className="px-3 py-3 text-sm text-gray-600">
@@ -1307,7 +1418,7 @@ const TestCaseManagement: React.FC = () => {
                                     <h4 className="mb-3 text-sm font-semibold text-gray-700">
                                       Add New Step
                                     </h4>
-                                    <div className="grid grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-4 gap-3">
                                       <div>
                                         <label className="mb-1 block text-xs font-medium text-gray-700">
                                           Step Details *
@@ -1321,6 +1432,23 @@ const TestCaseManagement: React.FC = () => {
                                             })
                                           }
                                           placeholder="Enter Step Details"
+                                          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          rows={3}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="mb-1 block text-xs font-medium text-gray-700">
+                                          Pre Condition
+                                        </label>
+                                        <textarea
+                                          value={newStep.preCondition}
+                                          onChange={(e) =>
+                                            setNewStep({
+                                              ...newStep,
+                                              preCondition: e.target.value,
+                                            })
+                                          }
+                                          placeholder="Enter Pre Condition"
                                           className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                           rows={3}
                                         />
@@ -1366,6 +1494,7 @@ const TestCaseManagement: React.FC = () => {
                                           setAddingStepToTestCase(null);
                                           setNewStep({
                                             summary: "",
+                                            preCondition: "",
                                             testData: "",
                                             expectedResult: "",
                                           });

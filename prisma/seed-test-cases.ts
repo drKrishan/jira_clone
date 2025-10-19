@@ -67,6 +67,7 @@ async function seedTestCases() {
         stepNumber: 1,
         summary:
           "Verify that the login form is displayed correctly and all fields are accessible under normal network conditions.",
+        preCondition: "User is on the login page and not logged in",
         testData: "",
         expectedResult:
           "The login form is displayed successfully, and all fields are accessible without any issues.",
@@ -76,6 +77,7 @@ async function seedTestCases() {
         stepNumber: 2,
         summary:
           "Enter invalid input (e.g., blank fields or incorrect passwords) and submit the form under normal network conditions.",
+        preCondition: "Login form is displayed",
         testData: "Username: blank, Password: blank",
         expectedResult:
           "The system displays an error message indicating that the provided credentials are invalid.",
@@ -85,6 +87,7 @@ async function seedTestCases() {
         stepNumber: 3,
         summary:
           "Simulate slow network connections by adding delays or reducing bandwidth and attempt to log in.",
+        preCondition: "Network throttling tools are available",
         testData: "Network delay: 3000ms",
         expectedResult:
           "The system responds appropriately based on the network conditions, either displaying a loading animation or timing out.",
@@ -94,6 +97,7 @@ async function seedTestCases() {
         stepNumber: 4,
         summary:
           "Attempt to log in while the system is offline (no internet connection).",
+        preCondition: "Network can be disconnected",
         testData: "Network: Offline",
         expectedResult:
           "The system displays an error message indicating that the system cannot connect to the server.",
@@ -103,6 +107,7 @@ async function seedTestCases() {
         stepNumber: 5,
         summary:
           "Verify that the password is stored securely using hashing under normal network conditions.",
+        preCondition: "Database access is available for verification",
         testData: "Password: TestPass123!",
         expectedResult:
           "The password is hashed and stored securely in the database.",
@@ -112,6 +117,7 @@ async function seedTestCases() {
         stepNumber: 6,
         summary:
           "Test for password recovery and account creation functionality, but these features are outside the scope of this test case.",
+        preCondition: "User is on the login page",
         testData: "",
         expectedResult:
           "The system does not allow password recovery or account creation during the login process.",
@@ -144,6 +150,7 @@ async function seedTestCases() {
       {
         stepNumber: 1,
         summary: "Connect the oxygen sensor to the device",
+        preCondition: "Device is powered on and sensor port is accessible",
         testData: "Sensor Model: OX-200",
         expectedResult: "Sensor is recognized by the system",
         testCaseId: testCase2.id,
@@ -151,6 +158,7 @@ async function seedTestCases() {
       {
         stepNumber: 2,
         summary: "Start oxygen monitoring",
+        preCondition: "Sensor is connected and recognized",
         testData: "",
         expectedResult: "Real-time oxygen levels are displayed",
         testCaseId: testCase2.id,
@@ -159,6 +167,7 @@ async function seedTestCases() {
         stepNumber: 3,
         summary:
           "Verify alarm triggers when oxygen level falls below threshold",
+        preCondition: "Monitoring is active and threshold is configured",
         testData: "Threshold: 90%",
         expectedResult: "Alarm is triggered and notification is sent",
         testCaseId: testCase2.id,
@@ -190,6 +199,7 @@ async function seedTestCases() {
       {
         stepNumber: 1,
         summary: "Navigate to device settings",
+        preCondition: "User is logged in and device is accessible",
         testData: "",
         expectedResult: "Settings page is displayed",
         testCaseId: testCase3.id,
@@ -197,6 +207,7 @@ async function seedTestCases() {
       {
         stepNumber: 2,
         summary: "Select Run mode from available options",
+        preCondition: "Settings page is displayed and Run mode is available",
         testData: "Mode: Run",
         expectedResult: "Device switches to Run mode successfully",
         testCaseId: testCase3.id,
