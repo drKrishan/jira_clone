@@ -37,15 +37,15 @@ const TopNavbar: React.FC = () => {
           height={25}
         />
         <span className="text-sm font-medium text-gray-600">Jira Clone</span>
-        <Button
+        {/* <Button
           href="https://github.com/sebastianfdz/jira_clone"
           target="_blank"
           className="ml-3 hidden gap-x-2 md:flex"
         >
           <AiFillGithub />
           <span className="hidden text-sm font-medium">Github Repo</span>
-        </Button>
-        {stars ? (
+        </Button> */}
+        {/* {stars ? (
           <Button
             href="https://github.com/sebastianfdz/jira_clone"
             target="_blank"
@@ -59,7 +59,7 @@ const TopNavbar: React.FC = () => {
               <AiFillStar className="text-yellow-300" />
             </div>
           </Button>
-        ) : null}
+        ) : null} */}
       </div>
       {user ? (
         <div className="flex items-center gap-x-2">
