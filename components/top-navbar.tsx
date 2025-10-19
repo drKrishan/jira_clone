@@ -40,17 +40,17 @@ const TopNavbar: React.FC = () => {
         <Button
           href="https://github.com/sebastianfdz/jira_clone"
           target="_blank"
-          className="ml-3 flex gap-x-2"
+          className="ml-3 flex hidden gap-x-2"
         >
           <AiFillGithub />
-          <span className="text-sm font-medium">Github Repo</span>
+          <span className="hidden text-sm font-medium">Github Repo</span>
         </Button>
         {stars ? (
           <Button
             href="https://github.com/sebastianfdz/jira_clone"
             target="_blank"
             customColors
-            className="ml-3 flex gap-x-2 bg-black"
+            className="ml-3 flex hidden gap-x-2 bg-black"
           >
             <AiFillGithub className="text-white" />
             <span className=" text-sm font-medium text-white">Star</span>

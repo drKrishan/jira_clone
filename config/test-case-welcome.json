@@ -1,0 +1,22 @@
+{
+  "title": "Hello, I am QI. Your Test Case Generator.",
+  "description": "I've helped expedite test case authoring by swiftly creating test cases aligned with your user stories. Now, you can focus more on reviewing test cases, execution, and validation. Ultimately, I save your valuable time and effort, resulting in faster releases. Here is a summary of how you and your teams are utilising me.",
+  "currentSession": {
+    "testCasesCreated": 4,
+    "timeSaved": "2 Hours",
+    "timeSavedLabel": "Approximate Time Saving"
+  },
+  "userStats": {
+    "testCasesCreated": 14,
+    "testCasesUpdated": 0,
+    "timeSaved": "7 Hours",
+    "timeSavedLabel": "Approximate Time Saving"
+  },
+  "projectStats": {
+    "testCasesCreated": 14,
+    "testCasesUpdated": 0,
+    "timeSaved": "7 Hours",
+    "timeSavedLabel": "Approximate Time Saving",
+    "projectName": "QA Test Automation"
+  }
+}

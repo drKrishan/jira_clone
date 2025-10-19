@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
 import { IoSparkles } from "react-icons/io5";
 import {
   MdAdd,
@@ -32,6 +33,9 @@ import {
 } from "react-icons/md";
 import toast from "react-hot-toast";
 import { CreateTestCaseModal } from "@/components/modals/create-test-case";
+import welcomeConfig from "@/config/test-case-welcome.json";
+import Lottie from "lottie-react";
+import aiRobotAnimation from "@/public/animations/ai-robot.json";
 
 interface TestStep {
   id: string;
@@ -65,6 +69,8 @@ interface Folder {
 }
 
 const TestCaseManagement: React.FC = () => {
+  const { user } = useUser();
+
   const [activeTab, setActiveTab] = useState<
     "test-case" | "test-cycle" | "test-plan" | "test-report"
   >("test-case");
@@ -75,6 +81,7 @@ const TestCaseManagement: React.FC = () => {
   const [folderMenuOpen, setFolderMenuOpen] = useState<string | null>(null);
   const [deletingFolder, setDeletingFolder] = useState<string | null>(null);
   const [deletingTestCase, setDeletingTestCase] = useState<string | null>(null);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [sortBy, setSortBy] = useState<
     | "name-asc"
     | "name-desc"
@@ -125,6 +132,16 @@ const TestCaseManagement: React.FC = () => {
   // Fetch folders on mount
   useEffect(() => {
     fetchFolders();
+
+    // Check if welcome modal has been shown before
+    const hasSeenWelcome = localStorage.getItem("testCaseWelcomeShown");
+    if (!hasSeenWelcome) {
+      // Show modal after a short delay for better UX
+      setTimeout(() => {
+        setShowWelcomeModal(true);
+        localStorage.setItem("testCaseWelcomeShown", "true");
+      }, 500);
+    }
   }, []);
 
   const fetchFolders = async () => {
@@ -1791,6 +1808,302 @@ const TestCaseManagement: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Welcome Modal - Enhanced with Animations */}
+      {showWelcomeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm"
+          style={{ animation: "fadeIn 0.3s ease-out" }}
+        >
+          <style jsx>{`
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+              }
+              to {
+                opacity: 1;
+              }
+            }
+            @keyframes slideUp {
+              from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+              }
+            }
+            @keyframes float {
+              0%,
+              100% {
+                transform: translateY(0px);
+              }
+              50% {
+                transform: translateY(-10px);
+              }
+            }
+            @keyframes shimmer {
+              0% {
+                background-position: -1000px 0;
+              }
+              100% {
+                background-position: 1000px 0;
+              }
+            }
+            @keyframes pulse {
+              0%,
+              100% {
+                opacity: 1;
+              }
+              50% {
+                opacity: 0.5;
+              }
+            }
+            .animate-slideUp {
+              animation: slideUp 0.5s ease-out;
+            }
+            .animate-float {
+              animation: float 3s ease-in-out infinite;
+            }
+            .shimmer-bg {
+              background: linear-gradient(
+                90deg,
+                rgba(59, 130, 246, 0) 0%,
+                rgba(59, 130, 246, 0.1) 50%,
+                rgba(59, 130, 246, 0) 100%
+              );
+              background-size: 1000px 100%;
+              animation: shimmer 3s infinite;
+            }
+          `}</style>
+
+          <div className="animate-slideUp relative w-full max-w-4xl overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 via-white to-indigo-50 shadow-2xl ring-1 ring-gray-200">
+            {/* Decorative Background Elements */}
+            <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-400/20 blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-gradient-to-tr from-cyan-400/20 to-blue-400/20 blur-3xl"></div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowWelcomeModal(false)}
+              className="absolute right-6 top-6 z-10 rounded-full bg-white/80 p-2.5 text-gray-500 shadow-lg backdrop-blur-sm transition-all hover:bg-white hover:text-gray-700 hover:shadow-xl"
+            >
+              <MdClose className="text-xl" />
+            </button>
+
+            {/* Modal Content */}
+            <div className="relative p-10">
+              {/* Header with Lottie Animation */}
+              <div className="mb-8 flex items-start gap-x-8">
+                <div className="flex-shrink-0">
+                  <div className="animate-float relative">
+                    {/* Lottie Animation Container */}
+                    <div className="relative h-32 w-32">
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 shadow-2xl"></div>
+                      <div className="shimmer-bg absolute inset-0 rounded-3xl"></div>
+                      <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-3xl">
+                        {/* Lottie Background Animation */}
+                        <div className="absolute inset-0 opacity-40">
+                          <Lottie
+                            animationData={aiRobotAnimation}
+                            loop={true}
+                            className="h-full w-full scale-150"
+                          />
+                        </div>
+                        {/* Sparkles Icon Foreground */}
+                        <div className="relative z-10">
+                          <IoSparkles className="text-6xl text-white drop-shadow-2xl" />
+                        </div>
+                      </div>
+                      {/* Pulse Ring */}
+                      <div
+                        className="absolute -inset-2 rounded-3xl border-4 border-blue-400/30"
+                        style={{ animation: "pulse 2s ease-in-out infinite" }}
+                      ></div>
+                    </div>
+                    {/* Checkmark Badge */}
+                    <div className="absolute -bottom-3 -right-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg ring-4 ring-white">
+                      <MdCheck className="text-2xl text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 pt-2">
+                  <div className="mb-2 inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-semibold text-blue-700">
+                    🤖 AI-Powered Assistant
+                  </div>
+                  <h2 className="mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-bold text-transparent">
+                    {welcomeConfig.title.replace(
+                      "I am",
+                      user?.firstName ? `I am ${user.firstName}'s` : "I am"
+                    )}
+                  </h2>
+                  <p className="text-base leading-relaxed text-gray-600">
+                    {welcomeConfig.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Section - Enhanced Cards */}
+              <div className="space-y-4">
+                {/* Current Session Stats */}
+                <div className="group relative overflow-hidden rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-white to-blue-50/50 p-6 shadow-md transition-all hover:shadow-xl">
+                  <div className="shimmer-bg absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+                  <div className="relative">
+                    <div className="mb-1 flex items-center gap-x-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                        <IoSparkles className="text-lg text-blue-600" />
+                      </div>
+                      <h3 className="text-sm font-bold uppercase tracking-wide text-gray-600">
+                        Total Test Cases created in current session
+                      </h3>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex items-baseline gap-x-2">
+                        <div className="text-5xl font-extrabold text-gray-800">
+                          {welcomeConfig.currentSession.testCasesCreated}
+                        </div>
+                        <div className="text-sm font-medium text-gray-500">
+                          Test Cases
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center justify-end gap-x-2">
+                          <div className="text-4xl font-extrabold text-blue-600">
+                            {welcomeConfig.currentSession.timeSaved}
+                          </div>
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 ring-2 ring-blue-200">
+                            <span className="text-xs font-bold text-blue-600">
+                              ⓘ
+                            </span>
+                          </div>
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-gray-500">
+                          {welcomeConfig.currentSession.timeSavedLabel}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Stats */}
+                <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-md transition-all hover:shadow-lg">
+                  <div className="shimmer-bg absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+                  <div className="relative">
+                    <h3 className="mb-5 text-sm font-medium text-gray-700">
+                      Total Test Cases created or updated by{" "}
+                      <span className="font-bold text-blue-600">
+                        {user?.firstName || "you"}
+                      </span>{" "}
+                      using QI across all projects
+                    </h3>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="mb-1 flex items-center justify-center">
+                          <div className="text-3xl font-extrabold text-gray-800">
+                            {welcomeConfig.userStats.testCasesCreated}
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          Created
+                        </div>
+                      </div>
+                      <div className="border-x border-gray-200 text-center">
+                        <div className="mb-1 flex items-center justify-center">
+                          <div className="text-3xl font-extrabold text-gray-800">
+                            {welcomeConfig.userStats.testCasesUpdated}
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          Updated/Versioned
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="mb-1 flex items-center justify-center gap-x-2">
+                          <div className="text-3xl font-extrabold text-blue-600">
+                            {welcomeConfig.userStats.timeSaved}
+                          </div>
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
+                            <span className="text-xs font-bold text-blue-600">
+                              ⓘ
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          {welcomeConfig.userStats.timeSavedLabel}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project Stats */}
+                <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-md transition-all hover:shadow-lg">
+                  <div className="shimmer-bg absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+                  <div className="relative">
+                    <h3 className="mb-5 text-sm font-medium text-gray-700">
+                      Total Test Cases created or updated by All Users using QI
+                      in{" "}
+                      <span className="font-bold text-blue-600">
+                        {welcomeConfig.projectStats.projectName}
+                      </span>{" "}
+                      project
+                    </h3>
+                    <div className="grid grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="mb-1 flex items-center justify-center">
+                          <div className="text-3xl font-extrabold text-gray-800">
+                            {welcomeConfig.projectStats.testCasesCreated}
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          Created
+                        </div>
+                      </div>
+                      <div className="border-x border-gray-200 text-center">
+                        <div className="mb-1 flex items-center justify-center">
+                          <div className="text-3xl font-extrabold text-gray-800">
+                            {welcomeConfig.projectStats.testCasesUpdated}
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          Updated/Versioned
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="mb-1 flex items-center justify-center gap-x-2">
+                          <div className="text-3xl font-extrabold text-blue-600">
+                            {welcomeConfig.projectStats.timeSaved}
+                          </div>
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
+                            <span className="text-xs font-bold text-blue-600">
+                              ⓘ
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          {welcomeConfig.projectStats.timeSavedLabel}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 text-center">
+                <Button
+                  onClick={() => setShowWelcomeModal(false)}
+                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-10 py-3 text-base font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+                >
+                  <span className="relative z-10">Got it, thanks! 🚀</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-indigo-700 opacity-0 transition-opacity group-hover:opacity-100"></div>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Folder Modal */}
       {isCreateFolderModalOpen && (
