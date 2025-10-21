@@ -298,7 +298,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           setIsCompleted(true);
           setGeneratedCount(15);
           setIsGenerating(false);
-          toast.success("Test cases generated successfully!");
+          toast.success("Test scenarios generated successfully!");
           return 100;
         }
         // Increment progress with variable speed for realistic effect
@@ -386,7 +386,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                AI Test Case Generator
+                AI Test Scenario Generator
               </h3>
               <p className="text-sm text-gray-600">Powered by Novigi's QI</p>
             </div>
@@ -508,7 +508,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </label>
           <p className="mb-3 text-xs text-gray-500">
             Upload requirements, specs, or related documents to help AI generate
-            better test cases
+            better test scenarios
           </p>
 
           {/* Hidden File Input */}
@@ -585,38 +585,10 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             <div className="text-sm text-blue-800">
               <p className="font-medium">AI will analyze your user story</p>
               <p className="mt-1 text-blue-700">
-                Test cases will be generated based on acceptance criteria, edge
-                cases, and best practices.
+                Test scenarios will be generated based on acceptance criteria,
+                edge cases, and best practices.
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Test Case and Step Count Inputs */}
-        <div className="mb-4 grid grid-cols-2 gap-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Test case count
-            </label>
-            <input
-              type="number"
-              min="1"
-              defaultValue="5"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="Enter count"
-            />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Step count
-            </label>
-            <input
-              type="number"
-              min="1"
-              defaultValue="3"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="Enter count"
-            />
           </div>
         </div>
 
@@ -636,7 +608,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 ? "Generating..."
                 : isCompleted
                 ? "Generated!"
-                : "Generate Test Cases"}
+                : "Generate Test Scenarios"}
               {!isGenerating &&
                 !isCompleted &&
                 selectedTestTypes.length > 0 &&
@@ -713,7 +685,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 p-4">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-semibold text-purple-900">
-                Generating test cases...
+                Generating test scenarios...
               </span>
               <span className="text-sm font-bold text-purple-700">
                 {Math.round(progress)}%
@@ -727,7 +699,7 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <p className="mt-2 text-xs text-purple-700">
               AI is analyzing your user story and generating comprehensive test
-              cases...
+              scenarios...
             </p>
           </div>
         )}
@@ -741,18 +713,18 @@ const TestCaseGenerator: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
               <div className="flex-1">
                 <h4 className="mb-1 text-base font-bold text-green-900">
-                  Test Cases Generated Successfully !
+                  Test Scenarios Generated Successfully !
                 </h4>
                 <p className="mb-3 text-sm text-green-800">
-                  Your test cases have been successfully created and are ready
-                  for review.
+                  Your test scenarios have been successfully created and are
+                  ready for review.
                 </p>
                 <Link
                   href="/project/test-cases"
                   className="inline-flex items-center gap-x-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 hover:shadow-lg"
                 >
                   <FaCheckCircle className="text-base" />
-                  <span>View Test Cases</span>
+                  <span>View Test Scenarios</span>
                 </Link>
               </div>
             </div>

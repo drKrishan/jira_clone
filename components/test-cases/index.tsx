@@ -804,7 +804,7 @@ const TestCaseManagement: React.FC = () => {
           <TabButton
             active={activeTab === "test-case"}
             icon={<FiFileText className="text-base" />}
-            label="Test Case"
+            label="Test Scenario"
             onClick={() => setActiveTab("test-case")}
           />
           <TabButton
@@ -833,7 +833,7 @@ const TestCaseManagement: React.FC = () => {
             className="flex items-center gap-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:from-purple-700 hover:to-indigo-700 hover:shadow-md"
           >
             <IoSparkles className="text-base" />
-            <span className="font-semibold">Generate Test Cases</span>
+            <span className="font-semibold">Generate Test Scenario</span>
           </Button>
           <CreateTestCaseModal
             folderId={selectedFolder}
@@ -1111,14 +1111,24 @@ const TestCaseManagement: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <Button
-                customColors
-                onClick={() => fetchTestCases(selectedFolder)}
-                className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                title="Refresh test cases"
-              >
-                <MdRefresh className="text-lg" />
-              </Button>
+              <div className="flex items-center gap-x-2">
+                <Button
+                  customColors
+                  onClick={() => fetchTestCases(selectedFolder)}
+                  className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                  title="Refresh test cases"
+                >
+                  <MdRefresh className="text-lg" />
+                </Button>
+                <Button
+                  customColors
+                  className="flex items-center gap-x-2 rounded-lg border border-indigo-500 bg-gradient-to-r from-indigo-500 to-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-md transition-all hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg"
+                  title="Generate Requirements Traceability Matrix"
+                >
+                  <FiBarChart2 className="text-base" />
+                  <span>Generate RTM</span>
+                </Button>
+              </div>
             </div>
 
             <div className="flex items-center gap-x-2">
@@ -1266,7 +1276,7 @@ const TestCaseManagement: React.FC = () => {
                       <div className="flex flex-col items-center gap-y-3">
                         <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
                         <p className="text-sm font-medium text-gray-600">
-                          Loading test cases...
+                          Loading test scenarios...
                         </p>
                       </div>
                     </td>
